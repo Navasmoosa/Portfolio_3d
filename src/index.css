@@ -1,0 +1,297 @@
+:root {
+  --tva-gold: #e5b342;
+  --tva-gold-glow: rgba(229, 179, 66, 0.4);
+  --tva-amber: #f59e0b;
+  --tva-orange: #f97316;
+  --miss-minutes-orange: #ff6a00;
+  --tva-stone-dark: #0f0d0b;
+  --tva-stone-surface: #1a1714;
+  --tva-stone-card: #24201b;
+  --tva-stone-light: #36302a;
+  --tva-bronze: #9c6c38;
+  --tva-border: rgba(229, 179, 66, 0.25);
+  --tva-border-bright: rgba(245, 158, 11, 0.65);
+  --tva-crt-green: #34d399;
+  --tva-holo-cyan: #38bdf8;
+  --font-display: 'Cinzel', serif;
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-sans: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--tva-stone-dark);
+  color: #f5f0e6;
+  font-family: var(--font-sans);
+  user-select: none;
+}
+
+/* Master Layout */
+.app-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 30%, #201a14 0%, #0d0a08 100%);
+}
+
+/* WebGL Canvas Viewport */
+.webgl-canvas-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* Retro TVA CRT Scanlines effect */
+.crt-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    rgba(18, 16, 14, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  ),
+  radial-gradient(circle at center, transparent 65%, rgba(10, 8, 6, 0.75) 100%);
+  background-size: 100% 4px, 100% 100%;
+  z-index: 20;
+}
+
+/* TVA Vintage Vignette */
+.tva-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 100px rgba(10, 8, 6, 0.85), inset 0 0 40px rgba(245, 158, 11, 0.12);
+  z-index: 21;
+}
+
+/* TVA Top Bar */
+.tva-header-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: linear-gradient(180deg, rgba(15, 13, 11, 0.9) 0%, rgba(15, 13, 11, 0.4) 80%, transparent 100%);
+  border-bottom: 1px solid rgba(229, 179, 66, 0.2);
+  z-index: 30;
+  backdrop-filter: blur(10px);
+}
+
+.tva-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tva-logo-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--tva-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  color: var(--tva-gold);
+  font-size: 13px;
+  background: rgba(40, 30, 20, 0.8);
+  box-shadow: 0 0 12px var(--tva-gold-glow);
+}
+
+.tva-title-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.tva-main-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--tva-gold);
+}
+
+.tva-sub-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #a89a8a;
+  letter-spacing: 1px;
+}
+
+/* Top Action Buttons */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tva-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(36, 32, 27, 0.85);
+  border: 1px solid var(--tva-border);
+  color: #eeddc5;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+
+.tva-btn:hover {
+  background: rgba(60, 50, 40, 0.95);
+  border-color: var(--tva-gold);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(229, 179, 66, 0.35);
+  transform: translateY(-1px);
+}
+
+.tva-btn-primary {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  border-color: #f59e0b;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+}
+
+.tva-btn-primary:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 0 22px rgba(245, 158, 11, 0.6);
+}
+
+/* Glassmorphic TVA Cards */
+.tva-panel {
+  background: rgba(26, 23, 20, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--tva-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65), 0 0 20px rgba(229, 179, 66, 0.1);
+  border-radius: 8px;
+}
+
+.tva-panel:hover {
+  border-color: var(--tva-border-bright);
+}
+
+/* Gold Typography */
+.tva-gold-text {
+  background: linear-gradient(135deg, #ffe082 0%, #d4af37 50%, #996515 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.tva-amber-glow {
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+}
+
+.tva-cyan-glow {
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+}
+
+.tva-green-glow {
+  text-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
+}
+
+/* Animations */
+@keyframes floatBob {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.4), inset 0 0 10px rgba(249, 115, 22, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(249, 115, 22, 0.75), inset 0 0 15px rgba(249, 115, 22, 0.4);
+  }
+}
+
+@keyframes gearRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-float {
+  animation: floatBob 3.5s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+.animate-gear {
+  animation: gearRotate 30s linear infinite;
+}
+
+/* Custom Scrollbar for modals */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(26, 23, 20, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--tva-bronze);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tva-gold);
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .tva-header-bar {
+    padding: 0 12px;
+    height: 52px;
+  }
+  .tva-main-title {
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+  .tva-sub-title {
+    font-size: 9px;
+  }
+  .tva-btn {
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+}
