@@ -1,17 +1,86 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useImperativeHandle } from 'react';
 import * as THREE from 'three';
 import { TVACharacter } from './TVACharacter';
 import { MissMinutes } from './MissMinutes';
-import { STATIONS, PERSONAL_INFO, APPS_DATA } from '../../data/portfolioData';
+import { STATIONS } from '../../data/portfolioData';
+import { soundEngine } from '../../utils/SoundEffects';
 
-export default function TVAWorld({
-  currentStationIndex,
-  onStationChange,
-  onAppSelect,
-  isTalking,
-  onInspectObject,
-}) {
+// Station Checkpoints Coordinates in 3D Space
+export const STATION_CHECKPOINTS = [
+  { id: 'welcome', index: 0, z: 8, x: 0, name: 'Scene 1: Welcome', color: 0xf59e0b },
+  { id: 'aboutme', index: 1, z: -2, x: 0, name: 'Scene 2: About Me', color: 0x34d399 },
+  { id: 'experience', index: 2, z: -12, x: 0, name: 'Scene 3: Experience', color: 0xe5b342 },
+  { id: 'projects', index: 3, z: -24, x: 0, name: 'Scene 4: Projects', color: 0xef4444 },
+  { id: 'qualifications', index: 4, z: -36, x: 0, name: 'Scene 5: Skills', color: 0xf59e0b },
+  { id: 'contact', index: 5, z: -48, x: 0, name: 'Scene 6: Contact', color: 0x38bdf8 },
+  { id: 'thankyou', index: 6, z: -58, x: 0, name: 'Scene 7: Thank You', color: 0xd4af37 },
+];
+
+const TVAWorld = React.forwardRef(function TVAWorld(
+  {
+    currentStationIndex,
+    onStationChange,
+    onAppSelect,
+    isTalking,
+    onPlayerTelemetry,
+  },
+  ref
+) {
   const mountRef = useRef(null);
+  const characterRef = useRef(null);
+  const onStationChangeRef = useRef(onStationChange);
+  const onPlayerTelemetryRef = useRef(onPlayerTelemetry);
+  const onAppSelectRef = useRef(onAppSelect);
+  const isTalkingRef = useRef(isTalking);
+  const activeStationIndexRef = useRef(currentStationIndex);
+
+  // Keep callback refs updated without re-running Three.js setup
+  useEffect(() => {
+    onStationChangeRef.current = onStationChange;
+  }, [onStationChange]);
+
+  useEffect(() => {
+    onPlayerTelemetryRef.current = onPlayerTelemetry;
+  }, [onPlayerTelemetry]);
+
+  useEffect(() => {
+    onAppSelectRef.current = onAppSelect;
+  }, [onAppSelect]);
+
+  useEffect(() => {
+    isTalkingRef.current = isTalking;
+  }, [isTalking]);
+
+  // When external station changes (e.g. from AutoTour or HUD dot click), walk character to that station
+  useEffect(() => {
+    activeStationIndexRef.current = currentStationIndex;
+    const cp = STATION_CHECKPOINTS[currentStationIndex];
+    if (cp && characterRef.current) {
+      characterRef.current.setTargetPosition(0, cp.z);
+    }
+  }, [currentStationIndex]);
+
+  // Imperative handle for parent / D-Pad button controls
+  useImperativeHandle(ref, () => ({
+    step: (direction) => {
+      if (characterRef.current) {
+        return characterRef.current.step(direction);
+      }
+      return null;
+    },
+    walkContinuous: (vx, vz, delta) => {
+      if (characterRef.current) {
+        characterRef.current.walkVelocity(vx, vz, delta);
+      }
+    },
+    teleportToStation: (stationIndex) => {
+      const cp = STATION_CHECKPOINTS[stationIndex];
+      if (cp && characterRef.current) {
+        characterRef.current.setTargetPosition(0, cp.z);
+      }
+    },
+    getCharacter: () => characterRef.current,
+  }));
 
   useEffect(() => {
     const container = mountRef.current;
@@ -28,7 +97,8 @@ export default function TVAWorld({
       0.1,
       120
     );
-    camera.position.set(0, 1.8, 12);
+    // Initial Third-Person Camera Placement behind player at Scene 1
+    camera.position.set(0, 2.0, 12.8);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -43,7 +113,7 @@ export default function TVAWorld({
 
     container.appendChild(renderer.domElement);
 
-    // 2. Lighting (TVA Warm Amber & Cinematic Bronze)
+    // 2. Lighting (Warm Amber & Cinematic Bronze)
     const ambientLight = new THREE.AmbientLight(0xffdfb0, 0.75);
     scene.add(ambientLight);
 
@@ -55,9 +125,13 @@ export default function TVAWorld({
     dirLight.shadow.bias = -0.0005;
     scene.add(dirLight);
 
-    // 3. Characters
-    const lokiCharacter = new TVACharacter();
-    scene.add(lokiCharacter.group);
+    // 3. Characters (Navas Moosa & Miss Minutes)
+    const navasCharacter = new TVACharacter();
+    // Start at Scene 1 (Z = 8)
+    navasCharacter.setTargetPosition(0, 8);
+    navasCharacter.group.position.set(0, 0, 8);
+    scene.add(navasCharacter.group);
+    characterRef.current = navasCharacter;
 
     const missMinutes = new MissMinutes();
     scene.add(missMinutes.group);
@@ -65,11 +139,11 @@ export default function TVAWorld({
     // Texture Loader
     const textureLoader = new THREE.TextureLoader();
 
-    // 4. Build Grand TVA Brutalist Architecture
+    // 4. Build Corridor Architecture
     const corridorGroup = new THREE.Group();
     scene.add(corridorGroup);
 
-    // Floor (Dark Polished TVA Marble with Specular Sheen)
+    // Floor (Dark Polished Marble with Specular Sheen)
     const floorGeo = new THREE.PlaneGeometry(16, 130);
     const floorMat = new THREE.MeshStandardMaterial({
       color: 0x161311,
@@ -191,7 +265,76 @@ export default function TVAWorld({
     wallRight.position.set(5.5, 2.6, -28);
     corridorGroup.add(wallRight);
 
-    // 5. Build Station Props & Holograms
+    // ========================================================
+    // 5. BUILD HOLOGRAPHIC STATION WAYPOINT ARRIVAL PADS
+    // ========================================================
+    const waypointPads = [];
+
+    STATION_CHECKPOINTS.forEach((cp) => {
+      const padGroup = new THREE.Group();
+      padGroup.position.set(0, 0.012, cp.z);
+
+      // Outer Torus Ring
+      const outerRingGeo = new THREE.TorusGeometry(1.65, 0.035, 16, 48);
+      const outerRingMat = new THREE.MeshBasicMaterial({ color: cp.color });
+      const outerRing = new THREE.Mesh(outerRingGeo, outerRingMat);
+      outerRing.rotation.x = Math.PI / 2;
+      padGroup.add(outerRing);
+
+      // Inner Glowing Disc
+      const discGeo = new THREE.CircleGeometry(1.6, 32);
+      const discMat = new THREE.MeshBasicMaterial({
+        color: cp.color,
+        transparent: true,
+        opacity: 0.16,
+        side: THREE.DoubleSide,
+      });
+      const disc = new THREE.Mesh(discGeo, discMat);
+      disc.rotation.x = Math.PI / 2;
+      padGroup.add(disc);
+
+      // Rotating Dash Ring
+      const dashRingGeo = new THREE.RingGeometry(1.25, 1.35, 24);
+      const dashRingMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.28,
+        side: THREE.DoubleSide,
+      });
+      const dashRing = new THREE.Mesh(dashRingGeo, dashRingMat);
+      dashRing.rotation.x = -Math.PI / 2;
+      dashRing.position.y = 0.005;
+      padGroup.add(dashRing);
+
+      // Floating 3D Checkpoint Label Plate
+      const wpCanvas = document.createElement('canvas');
+      wpCanvas.width = 512;
+      wpCanvas.height = 128;
+      const wpCtx = wpCanvas.getContext('2d');
+      wpCtx.fillStyle = '#111827';
+      wpCtx.beginPath();
+      wpCtx.roundRect(8, 8, 496, 112, 24);
+      wpCtx.fill();
+      wpCtx.strokeStyle = '#' + new THREE.Color(cp.color).getHexString();
+      wpCtx.lineWidth = 8;
+      wpCtx.stroke();
+
+      wpCtx.fillStyle = '#ffffff';
+      wpCtx.font = 'bold 34px sans-serif';
+      wpCtx.textAlign = 'center';
+      wpCtx.fillText(cp.name.toUpperCase(), 256, 74);
+
+      const wpTexture = new THREE.CanvasTexture(wpCanvas);
+      const wpBadge = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.8, 0.45),
+        new THREE.MeshBasicMaterial({ map: wpTexture, transparent: true, side: THREE.DoubleSide })
+      );
+      wpBadge.position.set(0, 0.4, 0);
+      padGroup.add(wpBadge);
+
+      scene.add(padGroup);
+      waypointPads.push({ group: padGroup, dashRing, wpBadge, checkpoint: cp });
+    });
 
     // ========================================================
     // SCENE 2: NAVAS MOOSA 3D DISPLAY ON LEFT SIDE (Z = -2)
@@ -199,7 +342,6 @@ export default function TVAWorld({
     const navasShowcaseGroup = new THREE.Group();
     navasShowcaseGroup.position.set(-2.5, 0, -2);
 
-    // Brutalist Circular Pedestal Base
     const pedestalBaseGeo = new THREE.CylinderGeometry(1.2, 1.35, 0.45, 32);
     const pedestalBaseMat = new THREE.MeshStandardMaterial({
       color: 0x241a12,
@@ -212,18 +354,14 @@ export default function TVAWorld({
     pedestalBase.receiveShadow = true;
     navasShowcaseGroup.add(pedestalBase);
 
-    // Golden Inlay Ring on Pedestal
     const ringInlayGeo = new THREE.TorusGeometry(1.15, 0.025, 16, 48);
     const ringInlay = new THREE.Mesh(ringInlayGeo, goldMat);
     ringInlay.rotation.x = Math.PI / 2;
     ringInlay.position.y = 0.46;
     navasShowcaseGroup.add(ringInlay);
 
-    // Holographic Circular Projector Emitter Core
     const emitterCoreGeo = new THREE.CylinderGeometry(0.7, 0.7, 0.05, 32);
-    const emitterCoreMat = new THREE.MeshBasicMaterial({
-      color: 0xffaa00,
-    });
+    const emitterCoreMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
     const emitterCore = new THREE.Mesh(emitterCoreGeo, emitterCoreMat);
     emitterCore.position.y = 0.465;
     navasShowcaseGroup.add(emitterCore);
@@ -232,7 +370,6 @@ export default function TVAWorld({
     const navasTexture = textureLoader.load('/assets/navas_moosa_3d.jpg');
     navasTexture.colorSpace = THREE.SRGBColorSpace;
 
-    // Display Screen Mesh (16:9 ratio, angled slightly towards camera)
     const holoScreenGeo = new THREE.PlaneGeometry(2.2, 1.45);
     const holoScreenMat = new THREE.MeshStandardMaterial({
       map: navasTexture,
@@ -242,18 +379,17 @@ export default function TVAWorld({
     });
     const holoScreen = new THREE.Mesh(holoScreenGeo, holoScreenMat);
     holoScreen.position.set(0, 1.75, 0);
-    holoScreen.rotation.y = Math.PI / 5; // Angled facing the corridor center
+    holoScreen.rotation.y = Math.PI / 5;
     holoScreen.castShadow = true;
     navasShowcaseGroup.add(holoScreen);
 
-    // Golden TVA Bezel Frame around Navas 3D Hologram
     const frameGeo = new THREE.BoxGeometry(2.26, 1.51, 0.04);
     const frameMesh = new THREE.Mesh(frameGeo, brassTrimMat);
     frameMesh.position.set(0, 1.75, -0.015);
     frameMesh.rotation.y = Math.PI / 5;
     navasShowcaseGroup.add(frameMesh);
 
-    // TVA Hologram Label Badge under the 3D Image
+    // Label Badge under the 3D Image
     const labelCanvas = document.createElement('canvas');
     labelCanvas.width = 512;
     labelCanvas.height = 128;
@@ -271,11 +407,11 @@ export default function TVAWorld({
 
     lCtx.fillStyle = '#38bdf8';
     lCtx.font = 'bold 18px monospace';
-    lCtx.fillText('MASTER OF TIMELINE // WEB & SOFTWARE DEV', 256, 80);
+    lCtx.fillText('FULL-STACK WEB & SOFTWARE DEVELOPER', 256, 80);
 
     lCtx.fillStyle = '#94a3b8';
     lCtx.font = '14px monospace';
-    lCtx.fillText('ALPHA VARIANT • CALICUT UNIVERSITY (MCA/BCA)', 256, 108);
+    lCtx.fillText('CALICUT UNIVERSITY (MCA/BCA) • KOZHIKODE', 256, 108);
 
     const labelTexture = new THREE.CanvasTexture(labelCanvas);
     const labelGeo = new THREE.PlaneGeometry(1.6, 0.4);
@@ -347,10 +483,10 @@ export default function TVAWorld({
 
       crtCtx.fillStyle = '#34d399';
       crtCtx.font = 'bold 15px monospace';
-      crtCtx.fillText('STATUS: PRUNING 0.0%', 15, 35);
-      crtCtx.fillText('MASTER: NAVAS MOOSA', 15, 60);
-      crtCtx.fillText('BRANCH: EARTH-616 KL', 15, 85);
-      crtCtx.fillText('TIMELINE: SACRED & STABLE', 15, 230);
+      crtCtx.fillText('STATUS: ONLINE // 100%', 15, 35);
+      crtCtx.fillText('DEV: NAVAS MOOSA K P', 15, 60);
+      crtCtx.fillText('LOC: KOZHIKODE, KERALA', 15, 85);
+      crtCtx.fillText('SYSTEM: READY & STABLE', 15, 230);
       crtTexture.needsUpdate = true;
     }
 
@@ -395,7 +531,7 @@ export default function TVAWorld({
 
     expCtx.fillStyle = '#ffd868';
     expCtx.font = 'bold 26px "Cinzel", serif';
-    expCtx.fillText('FIELD WORK LOG // EXPERIENCE', 28, 50);
+    expCtx.fillText('WORK EXPERIENCE // PRACTICAL WORK', 28, 50);
 
     expCtx.fillStyle = '#38bdf8';
     expCtx.font = 'bold 20px sans-serif';
@@ -433,7 +569,6 @@ export default function TVAWorld({
     // SCENE 4: PROJECTS ARCHIVE (Z = -24)
     // Disaster Management System Table + 3D Holographic Phones
     // ========================================================
-    // Helper: Create Phone Screen Canvas Texture
     function createPhoneTexture(title, subtitle, badgeText, colorHex) {
       const cvs = document.createElement('canvas');
       cvs.width = 512;
@@ -451,7 +586,7 @@ export default function TVAWorld({
 
       c.fillStyle = '#ffffff';
       c.font = 'bold 24px monospace';
-      c.fillText('TVA 5G', 30, 48);
+      c.fillText('5G LIVE', 30, 48);
       c.fillText('10:10', 220, 48);
       c.fillText('100%', 420, 48);
 
@@ -480,7 +615,7 @@ export default function TVAWorld({
 
         c.fillStyle = '#cbd5e1';
         c.font = '20px sans-serif';
-        c.fillText('Sacred Timeline Certified Engine', 56, y + 80);
+        c.fillText('High Performance Web Engine', 56, y + 80);
       });
 
       c.fillStyle = colorHex;
@@ -525,16 +660,16 @@ export default function TVAWorld({
       return phoneGroup;
     }
 
-    // CampusFix Phone (Left side of Scene 4)
-    const campusTexture = createPhoneTexture('CampusFix', 'A Safer Campus Together', 'CASE #04', '#38bdf8');
-    const campusPhone = createPhoneMesh(campusTexture, '#38bdf8');
+    // Disaster Management SOS Beacon Device (Left side of Scene 4)
+    const campusTexture = createPhoneTexture('SOS Beacon', 'Emergency Geolocation Dispatch', 'MODULE #01', '#ef4444');
+    const campusPhone = createPhoneMesh(campusTexture, '#ef4444');
     campusPhone.position.set(-1.8, 1.8, -24);
     campusPhone.rotation.y = Math.PI / 5;
     scene.add(campusPhone);
 
-    // PocketTask Phone (Right side of Scene 4)
-    const pocketTexture = createPhoneTexture('PocketTask', 'Instant Tasks & Variant QA', 'CASE #05', '#a855f7');
-    const pocketPhone = createPhoneMesh(pocketTexture, '#a855f7');
+    // Disaster Management Fleet & Supply Dispatch Device (Right side of Scene 4)
+    const pocketTexture = createPhoneTexture('Relief Fleet', 'Resource & Boat Logistics', 'MODULE #02', '#f59e0b');
+    const pocketPhone = createPhoneMesh(pocketTexture, '#f59e0b');
     pocketPhone.position.set(1.8, 1.8, -24);
     pocketPhone.rotation.y = -Math.PI / 5;
     scene.add(pocketPhone);
@@ -637,7 +772,7 @@ export default function TVAWorld({
 
     // ========================================================
     // SCENE 6: LET'S WORK TOGETHER - CONTACT (Z = -48)
-    // Sacred Timeline Loom Strands & Floating Contact Nexus
+    // Floating Contact Nexus & Energy Strands
     // ========================================================
     const nexusGroup = new THREE.Group();
     nexusGroup.position.set(0, 2.5, -48);
@@ -661,7 +796,6 @@ export default function TVAWorld({
     }
     scene.add(nexusGroup);
 
-    // Floating Hologram Nexus Core
     const nexusCoreGeo = new THREE.IcosahedronGeometry(0.4, 1);
     const nexusCoreMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true });
     const nexusCore = new THREE.Mesh(nexusCoreGeo, nexusCoreMat);
@@ -684,7 +818,6 @@ export default function TVAWorld({
     const portalFrame = new THREE.Mesh(portalFrameGeo, portalFrameMat);
     portalGroup.add(portalFrame);
 
-    // Swirling amber energy door
     const portalCoreGeo = new THREE.PlaneGeometry(2.1, 3.6);
     const portalCoreMat = new THREE.MeshBasicMaterial({
       color: 0xff9900,
@@ -699,11 +832,57 @@ export default function TVAWorld({
     portalGroup.add(portalLight);
     scene.add(portalGroup);
 
-    // 6. Camera Position Interpolation
-    let targetCamera = { x: 0, y: 1.8, z: 12 };
-    let currentCamera = { x: 0, y: 1.8, z: 12 };
+    // ========================================================
+    // 6. KEYBOARD CONTROLS (WASD & ARROW KEYS)
+    // ========================================================
+    const keysDown = {
+      forward: false,
+      backward: false,
+      left: false,
+      right: false,
+    };
 
-    // Raycasting for interactive clicks
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+        e.preventDefault();
+        if (!keysDown.forward) {
+          navasCharacter.step('forward');
+          keysDown.forward = true;
+        }
+      } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+        e.preventDefault();
+        if (!keysDown.backward) {
+          navasCharacter.step('backward');
+          keysDown.backward = true;
+        }
+      } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        e.preventDefault();
+        if (!keysDown.left) {
+          navasCharacter.step('left');
+          keysDown.left = true;
+        }
+      } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        e.preventDefault();
+        if (!keysDown.right) {
+          navasCharacter.step('right');
+          keysDown.right = true;
+        }
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keysDown.forward = false;
+      if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keysDown.backward = false;
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keysDown.left = false;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keysDown.right = false;
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    // Raycasting for interactive clicks on 3D props
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
@@ -714,40 +893,43 @@ export default function TVAWorld({
 
       raycaster.setFromCamera(mouse, camera);
 
-      // Check click on CampusFix phone
+      // Check click on Disaster SOS Beacon phone
       const campusHits = raycaster.intersectObjects(campusPhone.children, true);
       if (campusHits.length > 0) {
-        if (onAppSelect) onAppSelect('campusfix');
+        if (onAppSelectRef.current) onAppSelectRef.current('disaster');
         return;
       }
 
-      // Check click on PocketTask phone
+      // Check click on Relief Fleet phone
       const pocketHits = raycaster.intersectObjects(pocketPhone.children, true);
       if (pocketHits.length > 0) {
-        if (onAppSelect) onAppSelect('pockettask');
+        if (onAppSelectRef.current) onAppSelectRef.current('disaster');
         return;
       }
 
       // Check click on Archive Table / Disaster
       const archiveHits = raycaster.intersectObjects(archiveTableGroup.children, true);
       if (archiveHits.length > 0) {
-        if (onAppSelect) onAppSelect('disaster');
+        if (onAppSelectRef.current) onAppSelectRef.current('disaster');
         return;
       }
 
       // Check click on Navas Moosa 3D Showcase
       const navasHits = raycaster.intersectObjects(navasShowcaseGroup.children, true);
       if (navasHits.length > 0) {
-        if (onStationChange) onStationChange(1); // Jump to About Me
+        if (onStationChangeRef.current) onStationChangeRef.current(1);
         return;
       }
     };
 
     renderer.domElement.addEventListener('pointerdown', handlePointerDown);
 
-    // 7. Animation Loop
+    // ========================================================
+    // 7. ANIMATION & OPEN WORLD CAMERA FOLLOW LOOP
+    // ========================================================
     let clock = new THREE.Clock();
     let animationFrameId;
+    let currentCamera = { x: 0, y: 2.0, z: 12.8 };
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
@@ -755,39 +937,100 @@ export default function TVAWorld({
       const delta = clock.getDelta();
       const time = clock.getElapsedTime();
 
-      // Update station target
-      const currentStation = STATIONS[currentStationIndex] || STATIONS[0];
-      targetCamera = currentStation.cameraPos;
+      // Continuous movement when keys are held down
+      let vx = 0;
+      let vz = 0;
+      if (keysDown.forward) vz -= 1;
+      if (keysDown.backward) vz += 1;
+      if (keysDown.left) vx -= 1;
+      if (keysDown.right) vx += 1;
 
-      lokiCharacter.setTargetPosition(
-        currentStation.characterPos.x,
-        currentStation.characterPos.z
-      );
+      if (vx !== 0 || vz !== 0) {
+        navasCharacter.walkVelocity(vx, vz, delta);
+      }
 
-      missMinutes.setTargetPosition(
-        currentStation.missMinutesPos.x,
-        currentStation.missMinutesPos.y,
-        currentStation.missMinutesPos.z
-      );
+      // Update Character
+      navasCharacter.update(delta, time);
 
-      // Smooth camera motion
-      currentCamera.x = THREE.MathUtils.lerp(currentCamera.x, targetCamera.x, delta * 3.2);
-      currentCamera.y = THREE.MathUtils.lerp(currentCamera.y, targetCamera.y, delta * 3.2);
-      currentCamera.z = THREE.MathUtils.lerp(currentCamera.z, targetCamera.z, delta * 3.2);
+      const charX = navasCharacter.group.position.x;
+      const charZ = navasCharacter.group.position.z;
+
+      // Check closest station arrival
+      let nearestStation = null;
+      let nearestDist = 999;
+
+      STATION_CHECKPOINTS.forEach((cp) => {
+        const d = Math.abs(charZ - cp.z);
+        if (d < nearestDist) {
+          nearestDist = d;
+          nearestStation = cp;
+        }
+      });
+
+      // Arrival trigger when inside station zone (<= 4.0 units)
+      if (nearestStation && nearestDist <= 4.0) {
+        if (activeStationIndexRef.current !== nearestStation.index) {
+          activeStationIndexRef.current = nearestStation.index;
+          if (onStationChangeRef.current) {
+            onStationChangeRef.current(nearestStation.index);
+          }
+          soundEngine.playChronoChime();
+        }
+      }
+
+      // Report live telemetry to UI
+      if (onPlayerTelemetryRef.current) {
+        onPlayerTelemetryRef.current({
+          x: charX,
+          z: charZ,
+          stepCount: navasCharacter.stepCount,
+          isNearStation: nearestDist <= 4.0,
+          distanceToStation: nearestDist,
+          activeStationIndex: activeStationIndexRef.current,
+        });
+      }
+
+      // THIRD-PERSON DYNAMIC FOLLOW CAMERA
+      // Positioned behind the player, gliding smoothly
+      const camTargetX = charX * 0.45;
+      const camTargetY = 2.05;
+      const camTargetZ = charZ + 4.8;
+
+      currentCamera.x = THREE.MathUtils.lerp(currentCamera.x, camTargetX, delta * 3.8);
+      currentCamera.y = THREE.MathUtils.lerp(currentCamera.y, camTargetY, delta * 3.8);
+      currentCamera.z = THREE.MathUtils.lerp(currentCamera.z, camTargetZ, delta * 3.8);
 
       camera.position.set(currentCamera.x, currentCamera.y, currentCamera.z);
-      camera.lookAt(
-        lokiCharacter.group.position.x * 0.4,
-        1.5,
-        lokiCharacter.group.position.z - 2.5
-      );
+      camera.lookAt(charX * 0.7, 1.45, charZ - 2.8);
 
-      // Update Characters
-      lokiCharacter.update(delta, time);
+      // MISS MINUTES COMPANION LOGIC
+      // Floats beside player in transit, or takes stage at active station
+      if (nearestDist > 4.0) {
+        // In transit: companion hover beside player
+        const mmTargetX = charX + 1.25;
+        const mmTargetY = 1.9 + Math.sin(time * 3) * 0.08;
+        const mmTargetZ = charZ - 0.5;
+        missMinutes.setTargetPosition(mmTargetX, mmTargetY, mmTargetZ);
+      } else {
+        // Arrived: presentation position at station
+        const stationData = STATIONS[activeStationIndexRef.current] || STATIONS[0];
+        missMinutes.setTargetPosition(
+          stationData.missMinutesPos.x,
+          stationData.missMinutesPos.y,
+          stationData.missMinutesPos.z
+        );
+      }
 
-      // Miss Minutes winks at viewer especially at Scene 1 (welcome)
-      const shouldWink = currentStationIndex === 0 && Math.sin(time * 2) > 0.6;
-      missMinutes.update(delta, time, isTalking, shouldWink);
+      const shouldWink = activeStationIndexRef.current === 0 && Math.sin(time * 2) > 0.6;
+      missMinutes.update(delta, time, isTalkingRef.current, shouldWink);
+
+      // Animate Waypoint Pads (gentle pulse and rotating dash ring)
+      waypointPads.forEach((wp) => {
+        wp.dashRing.rotation.z += delta * 0.6;
+        const isCurrent = wp.checkpoint.index === activeStationIndexRef.current;
+        wp.wpBadge.position.y = 0.4 + (isCurrent ? Math.sin(time * 3.5) * 0.06 : 0);
+        wp.wpBadge.rotation.y = Math.sin(time * 1.5) * 0.15;
+      });
 
       // Rotate Navas Moosa Hologram Ring
       holoRing.rotation.z += delta * 0.45;
@@ -804,14 +1047,14 @@ export default function TVAWorld({
       campusPhone.rotation.y = Math.PI / 5 + Math.sin(time * 1.5) * 0.06;
       pocketPhone.rotation.y = -Math.PI / 5 - Math.sin(time * 1.5) * 0.06;
 
-      // Animate CRT
+      // Animate CRT Screen
       updateCRT(time);
 
       // Animate Archive Beacon
       beacon.rotation.y += delta * 1.5;
       beacon.rotation.x += delta * 0.8;
 
-      // Animate Loom strands & nexus core
+      // Animate Loom Strands & Nexus Core
       nexusGroup.rotation.z = Math.sin(time * 0.8) * 0.1;
       nexusCore.rotation.x += delta * 0.8;
       nexusCore.rotation.y += delta * 1.2;
@@ -837,6 +1080,8 @@ export default function TVAWorld({
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
       renderer.domElement.removeEventListener('pointerdown', handlePointerDown);
       cancelAnimationFrame(animationFrameId);
       if (renderer.domElement && renderer.domElement.parentNode) {
@@ -844,7 +1089,9 @@ export default function TVAWorld({
       }
       renderer.dispose();
     };
-  }, [currentStationIndex, isTalking, onAppSelect, onStationChange]);
+  }, []);
 
   return <div ref={mountRef} className="webgl-canvas-container" />;
-}
+});
+
+export default TVAWorld;

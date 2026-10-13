@@ -9,20 +9,20 @@ export const PERSONAL_INFO = {
   email: "kpnavasmoosa@gmail.com",
   github: "https://github.com/Navasmoosa",
   linkedin: "https://www.linkedin.com/in/navasmoosa-kp-743b25281/",
-  summary: "Results-driven Web Developer and Software Developer with deep expertise in modern React architectures, full-stack systems, RESTful API design, and database engineering. Dedicated to pruning inefficiencies and building immaculate digital experiences across the Sacred Timeline.",
-  classification: "ALPHA VARIANT 88019-KP",
-  timelineId: "EARTH-616 // KERALA BRANCH",
-  status: "TVA CERTIFIED DEVELOPER",
+  summary: "Results-driven Web Developer and Software Developer with deep expertise in modern React architectures, full-stack web applications, RESTful API design, and database engineering. Dedicated to writing clean, maintainable code and building high-performance, user-friendly digital products.",
+  classification: "Full-Stack Web Developer",
+  timelineId: "Kozhikode, Kerala, India",
+  status: "Available for Hire / Open to Work",
 };
 
 export const STATIONS = [
   {
     id: "welcome",
     stepNumber: 1,
-    title: "Welcome & Identification",
-    subtitle: "Entering the Grand TVA Lobby with Miss Minutes & Loki",
-    quote: "Welcome to the Navas Variance Authority!",
-    missMinutesSpeech: "Hey y'all! Welcome to the Navas Variance Authority! Don't panic, you ain't being pruned today! My name is Miss Minutes, and I'm here to introduce you to the Master of this Timeline—Navas Moosa K P! He’s a Web and Software Developer straight out of Kozhikode, Kerala, keeping the digital multiverse running without a single glitch!",
+    title: "Welcome & Introduction",
+    subtitle: "Interactive 3D Portfolio of Navas Moosa K P",
+    quote: "Welcome to my interactive 3D portfolio!",
+    missMinutesSpeech: "Hello and welcome! I'm here to introduce you to Navas Moosa K P, a Web and Software Developer from Kozhikode, Kerala. Explore his interactive 3D portfolio to discover his projects, skills, and background!",
     accentColor: "#f59e0b",
     cameraPos: { x: 0, y: 1.8, z: 12 },
     characterPos: { x: 0, y: 0, z: 8 },
@@ -31,10 +31,10 @@ export const STATIONS = [
   {
     id: "aboutme",
     stepNumber: 2,
-    title: "About Me - Master of Timeline",
-    subtitle: "Meet Navas Moosa K P — Master of this Timeline",
-    quote: "Pruning branched code, architecting clean realities.",
-    missMinutesSpeech: "Well, look over to your left, sugar! That's Navas Moosa himself in all his glory! He’s pursuing his Master of Computer Applications (MCA) and holds a Bachelor's in Computer Applications from Calicut University. Navas specializes in building blazing-fast, secure, and intuitive web experiences that hold the multiverse together!",
+    title: "About Me",
+    subtitle: "Background, Education & Professional Experience",
+    quote: "Building clean, robust, and accessible digital products.",
+    missMinutesSpeech: "Meet Navas Moosa! He is pursuing his Master of Computer Applications (MCA) and graduated with distinction in Bachelor of Computer Applications (BCA) from Calicut University. Navas specializes in building responsive, high-performance web applications.",
     accentColor: "#34d399",
     cameraPos: { x: 0.1, y: 1.75, z: 1.5 },
     characterPos: { x: 0.5, y: 0, z: -2 },
@@ -43,10 +43,10 @@ export const STATIONS = [
   {
     id: "experience",
     stepNumber: 3,
-    title: "Experience - Field Work",
-    subtitle: "Pruning code bugs and architecting resilient digital ecosystems",
-    quote: "Field operations across full-stack ecosystems.",
-    missMinutesSpeech: "Welcome to the Field Operations wing! Navas has earned his stripes in high-stakes software development—crafting clean React architectures, designing resilient RESTful APIs, optimizing relational databases, and studying industry workflows right at Cyberpark Calicut. No timeline branch gets past him!",
+    title: "Experience & Practical Work",
+    subtitle: "Hands-on software development and engineering background",
+    quote: "Hands-on experience across full-stack ecosystems.",
+    missMinutesSpeech: "Here is Navas's hands-on background! He has experience developing clean React frontends, building RESTful APIs, optimizing relational databases, and studying real-world industry workflows at Cyberpark Calicut.",
     accentColor: "#e5b342",
     cameraPos: { x: 0.3, y: 1.75, z: -8.5 },
     characterPos: { x: -0.3, y: 0, z: -12 },
@@ -55,10 +55,10 @@ export const STATIONS = [
   {
     id: "projects",
     stepNumber: 4,
-    title: "Projects - Sacred Case-Files",
-    subtitle: "High-impact web solutions engineered for real-world impact",
-    quote: "Preserved in the sacred archives.",
-    missMinutesSpeech: "Step right up to our Sacred Archive! Gaze upon his flagship creation: the Disaster Management System! Built to coordinate life-saving relief with live emergency SOS alerts, resource routing, and risk heatmaps. Plus, check out CampusFix and PocketTask right on the floating holo-terminals!",
+    title: "Featured Projects",
+    subtitle: "Real-world web and mobile applications",
+    quote: "Explore live applications and source code.",
+    missMinutesSpeech: "Explore his featured projects! His flagship project is the Disaster Management System, built to coordinate emergency relief with live SOS alerts, resource routing, and risk heatmaps.",
     accentColor: "#ef4444",
     cameraPos: { x: 0, y: 1.8, z: -20 },
     characterPos: { x: 0.2, y: 0, z: -24 },
@@ -67,10 +67,10 @@ export const STATIONS = [
   {
     id: "qualifications",
     stepNumber: 5,
-    title: "Technical Skills & Qualifications",
-    subtitle: "Certified by the Minutemen Review Board",
-    quote: "Approved by the Minutemen Review Board.",
-    missMinutesSpeech: "Now take a gander at his certified weaponry! Master of Computer Applications in progress, BCA with honors, and sheer mastery over JavaScript, React, Node.js, Express, Python, PostgreSQL, and MongoDB. He prunes bad code faster than a reset charge!",
+    title: "Skills & Qualifications",
+    subtitle: "Technologies, frameworks, and academic degrees",
+    quote: "Core technologies and certified qualifications.",
+    missMinutesSpeech: "Here are his core technical skills and qualifications! Pursuing MCA, BCA with distinction, and strong proficiency in JavaScript, React, Node.js, Express, Python, PostgreSQL, and MongoDB.",
     accentColor: "#f59e0b",
     cameraPos: { x: 0, y: 1.8, z: -32 },
     characterPos: { x: -0.2, y: 0, z: -36 },
@@ -80,9 +80,9 @@ export const STATIONS = [
     id: "contact",
     stepNumber: 6,
     title: "Let's Work Together",
-    subtitle: "Connect with Navas across the digital multiverse",
-    quote: "Where all timelines converge.",
-    missMinutesSpeech: "We've arrived at the Grand Nexus where all timelines converge! Ready to team up and build something truly legendary? You can check out Navas's GitHub repos, connect with him on LinkedIn, drop him a line at kpnavasmoosa@gmail.com, or inspect his official TVA Case-File Resume right here!",
+    subtitle: "Get in touch for projects, employment, or collaborations",
+    quote: "Let's connect and build something great.",
+    missMinutesSpeech: "Interested in working together or hiring Navas? Feel free to browse his GitHub repositories, connect on LinkedIn, send an email to kpnavasmoosa@gmail.com, or view and download his complete resume!",
     accentColor: "#38bdf8",
     cameraPos: { x: 0, y: 1.85, z: -44 },
     characterPos: { x: 0, y: 0, z: -48 },
@@ -91,10 +91,10 @@ export const STATIONS = [
   {
     id: "thankyou",
     stepNumber: 7,
-    title: "Thank You - For All Time. Always.",
-    subtitle: "Step through the golden Time Door",
-    quote: "THANK YOU for watching! — NAVAS MOOSA K P ♡",
-    missMinutesSpeech: "The golden Time Door is wide open for you! On behalf of the Navas Variance Authority and everyone here at the TVA, thank you kindly for walking through this sacred timeline with Loki and me! For all time. Always. Don't forget to grab that Case-File before you step through!",
+    title: "Thank You",
+    subtitle: "Thank you for visiting my portfolio",
+    quote: "Thank you for visiting my portfolio! — Navas Moosa K P",
+    missMinutesSpeech: "Thank you so much for taking the time to explore this portfolio! Feel free to reach out anytime or download the resume below. Have a wonderful day!",
     accentColor: "#f59e0b",
     cameraPos: { x: 0, y: 1.8, z: -54 },
     characterPos: { x: 0, y: 0, z: -58 },
@@ -107,7 +107,7 @@ export const EDUCATION_DATA = [
     degree: "Master of Computer Application (MCA)",
     institution: "Calicut University",
     period: "In Progress",
-    status: "Active Timeline Branch",
+    status: "Currently Pursuing",
     badge: "Advanced Specialization"
   },
   {
@@ -121,7 +121,7 @@ export const EDUCATION_DATA = [
     degree: "Higher Secondary (Computer Science)",
     institution: "Government Higher Secondary School, Shivapuram",
     period: "2020 - 2022",
-    status: "TVA Foundational Clearance",
+    status: "Completed with First Class",
     badge: "Pre-Degree"
   }
 ];
@@ -145,7 +145,7 @@ export const SKILLS_DATA = {
     "RESTful API Design & Integration",
     "Modern Database Schema Modeling",
     "Responsive & Glassmorphic UI/UX",
-    "Git & Agile Timeline Control",
+    "Git Version Control & Agile Workflows",
     "Performance & Rendering Optimization"
   ],
   softSkills: [
@@ -168,70 +168,6 @@ export const SKILLS_DATA = {
 };
 
 export const APPS_DATA = {
-  campusfix: {
-    title: "CampusFix",
-    tagline: "A Safer Campus Together",
-    icon: "ShieldAlert",
-    category: "Mobile & Web Ecosystem",
-    description: "An integrated incident reporting and facility maintenance platform for university campuses. Enables real-time breakdown alerts, prioritized ticketing, technician assignment, and resolution verification.",
-    metrics: ["99.4% Uptime", "Sub-15m Dispatch", "3000+ Active Users"],
-    tabs: [
-      {
-        id: "report",
-        label: "Report",
-        icon: "AlertCircle",
-        summary: "Fast 3-step incident submission with photo attachments, geo-location pinning, and urgent priority flagging."
-      },
-      {
-        id: "management",
-        label: "Management",
-        icon: "Sliders",
-        summary: "Central administrative dashboard for triaging open cases, routing tickets to departments, and analytics."
-      },
-      {
-        id: "technician",
-        label: "Technician",
-        icon: "Wrench",
-        summary: "Field technician mobile view with push alerts, task checklists, parts requisition, and one-tap sign-off."
-      }
-    ],
-    techStack: ["React.js", "Node.js", "Express", "PostgreSQL", "Socket.io", "TailwindCSS"]
-  },
-  pockettask: {
-    title: "PocketTask",
-    tagline: "Instant Tasks. Seamless Execution.",
-    icon: "Smartphone",
-    category: "Productivity & Micro-Tasks",
-    description: "A high-velocity micro-task platform connecting enterprise data needs with crowdsourced verification. Manages surveys, dataset quality tagging, app QA reviews, and instantaneous digital payouts.",
-    metrics: ["10k+ Tasks Done", "Zero Fraud Latency", "Instant Payouts"],
-    tabs: [
-      {
-        id: "survey",
-        label: "Survey",
-        icon: "FileText",
-        summary: "Adaptive dynamic questionnaires with automated anti-cheat timing and demographic verification."
-      },
-      {
-        id: "data_entry",
-        label: "Data Entry",
-        icon: "Database",
-        summary: "Structured data parsing, label checking, and automated validation against schema rules."
-      },
-      {
-        id: "app_training",
-        label: "App Testing",
-        icon: "Cpu",
-        summary: "Regression testing suites, crowd bug bounty hunting, and UI sanity check workflows."
-      },
-      {
-        id: "micro_earners",
-        label: "Micro Earners",
-        icon: "Award",
-        summary: "Gamerized tier progression, streak bonuses, and automated crypto / UPI micro-ledger."
-      }
-    ],
-    techStack: ["React.js", "Python FastAPI", "MongoDB", "Redis", "JWT Auth"]
-  },
   disaster: {
     title: "Disaster Management System",
     tagline: "Academic Project: High-Efficiency Incident & Resource Response",

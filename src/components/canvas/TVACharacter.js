@@ -1,7 +1,8 @@
 import * as THREE from 'three';
+import { soundEngine } from '../../utils/SoundEffects';
 
-// 3D Realistic Animated Loki Character (Julian Thorne / Loki in TVA Administrative Suit)
-// Faithfully modeled after the official TVA character reference sheet
+// 3D Realistic Animated Navas Moosa Character in Bespoke All-Black Suit
+// Open-World Interactive Walking Character with 4-Direction Navigation
 export class TVACharacter {
   constructor() {
     this.group = new THREE.Group();
@@ -11,67 +12,70 @@ export class TVACharacter {
     this.currentZ = 8;
     this.targetX = 0;
     this.currentX = 0;
-    this.turnAngle = 0;
+    this.turnAngle = Math.PI; // Face forward down the corridor (-Z)
+    this.targetAngle = Math.PI;
+    this.stepCount = 0;
+    this.lastFootstep = 0;
 
     this.initModel();
   }
 
   initModel() {
-    // 1. Curated Materials matching Loki TVA Reference Sheet
-    // TVA Tailored Chocolate Brown Jacket
+    // 1. Curated Materials matching Navas Moosa 3D Character Sheet
+    // Tailored Obsidian Black Suit Jacket
     const suitJacketMat = new THREE.MeshStandardMaterial({
-      color: 0x4a2e1b, // Rich TVA Chocolate Brown
-      roughness: 0.75,
-      metalness: 0.1,
-    });
-
-    // TVA Lapel / Accent Material
-    const lapelMat = new THREE.MeshStandardMaterial({
-      color: 0x3e2515,
+      color: 0x18181b, // Bespoke Tailored Obsidian Black
       roughness: 0.7,
       metalness: 0.12,
     });
 
-    // Trousers (Matching tailored dark brown)
-    const pantsMat = new THREE.MeshStandardMaterial({
-      color: 0x422918,
-      roughness: 0.8,
-      metalness: 0.05,
-    });
-
-    // TVA Collared Shirt (Beige / Soft Cream Khaki)
-    const shirtMat = new THREE.MeshStandardMaterial({
-      color: 0xf0e9d2,
+    // Satin Black Lapel / Accent Material
+    const lapelMat = new THREE.MeshStandardMaterial({
+      color: 0x101012,
       roughness: 0.55,
-      metalness: 0.05,
+      metalness: 0.18,
     });
 
-    // Necktie (Tan / Gold Geometric Pattern)
+    // Tailored Black Trousers
+    const pantsMat = new THREE.MeshStandardMaterial({
+      color: 0x141416,
+      roughness: 0.78,
+      metalness: 0.06,
+    });
+
+    // Black Collared Shirt (Matching 3D Character Model Sheet)
+    const shirtMat = new THREE.MeshStandardMaterial({
+      color: 0x1c1c20,
+      roughness: 0.6,
+      metalness: 0.04,
+    });
+
+    // Slim Obsidian Tie / Placket Accent
     const tieMat = new THREE.MeshStandardMaterial({
-      color: 0xb59b6c,
-      roughness: 0.45,
-      metalness: 0.25,
-    });
-
-    // Loki Fair Skin Tone
-    const skinMat = new THREE.MeshStandardMaterial({
-      color: 0xe8bc9f,
-      roughness: 0.65,
-      metalness: 0.0,
-    });
-
-    // Loki Long Flowing Dark Espresso / Black Hair
-    const hairMat = new THREE.MeshStandardMaterial({
-      color: 0x14100e,
+      color: 0x0f0f11,
       roughness: 0.5,
       metalness: 0.15,
     });
 
-    // Shoes (Burnished Cognac Brown Leather)
+    // Navas Moosa Natural Warm South Asian Skin Tone
+    const skinMat = new THREE.MeshStandardMaterial({
+      color: 0xc49372,
+      roughness: 0.62,
+      metalness: 0.0,
+    });
+
+    // Dark Wavy Textured Hair
+    const hairMat = new THREE.MeshStandardMaterial({
+      color: 0x110f0d,
+      roughness: 0.55,
+      metalness: 0.1,
+    });
+
+    // Polished Black Leather Shoes
     const shoeMat = new THREE.MeshStandardMaterial({
-      color: 0x3d1c0c,
-      roughness: 0.28,
-      metalness: 0.35,
+      color: 0x0a0a0c,
+      roughness: 0.22,
+      metalness: 0.42,
     });
 
     // Sole & Heel
@@ -225,36 +229,36 @@ export class TVACharacter {
     nose.position.set(0, 0.19, 0.12);
     this.headGroup.add(nose);
 
-    // --- LOKI'S SIGNATURE LONG FLOWING DARK HAIR ---
-    // Top Hair Volume
-    const hairTopGeo = new THREE.BoxGeometry(0.245, 0.12, 0.25);
+    // --- NAVAS MOOSA'S SIGNATURE DARK WAVY HAIR ---
+    // Top Hair Volume & Waves
+    const hairTopGeo = new THREE.BoxGeometry(0.25, 0.13, 0.25);
     const hairTop = new THREE.Mesh(hairTopGeo, hairMat);
     hairTop.position.set(0, 0.33, 0.01);
     this.headGroup.add(hairTop);
 
-    // Left Hair Locks (Cascading down over ear to shoulder)
-    const hairLeftGeo = new THREE.BoxGeometry(0.045, 0.36, 0.24);
+    // Front Fringe Curls (Slightly overhang forehead)
+    const hairFrontGeo = new THREE.BoxGeometry(0.22, 0.07, 0.06);
+    const hairFront = new THREE.Mesh(hairFrontGeo, hairMat);
+    hairFront.position.set(0, 0.28, 0.12);
+    this.headGroup.add(hairFront);
+
+    // Left Wavy Side Locks
+    const hairLeftGeo = new THREE.BoxGeometry(0.045, 0.18, 0.23);
     const hairLeft = new THREE.Mesh(hairLeftGeo, hairMat);
-    hairLeft.position.set(-0.12, 0.18, -0.01);
+    hairLeft.position.set(-0.115, 0.25, 0.0);
     this.headGroup.add(hairLeft);
 
-    // Right Hair Locks (Cascading down over ear to shoulder)
-    const hairRightGeo = new THREE.BoxGeometry(0.045, 0.36, 0.24);
+    // Right Wavy Side Locks
+    const hairRightGeo = new THREE.BoxGeometry(0.045, 0.18, 0.23);
     const hairRight = new THREE.Mesh(hairRightGeo, hairMat);
-    hairRight.position.set(0.12, 0.18, -0.01);
+    hairRight.position.set(0.115, 0.25, 0.0);
     this.headGroup.add(hairRight);
 
-    // Back Long Hair Layer 1 (Upper neck)
-    const hairBackGeo1 = new THREE.BoxGeometry(0.24, 0.32, 0.08);
+    // Back Tapered Hair
+    const hairBackGeo1 = new THREE.BoxGeometry(0.23, 0.20, 0.06);
     const hairBack1 = new THREE.Mesh(hairBackGeo1, hairMat);
-    hairBack1.position.set(0, 0.18, -0.12);
+    hairBack1.position.set(0, 0.23, -0.115);
     this.headGroup.add(hairBack1);
-
-    // Back Long Hair Layer 2 (Shoulder-length cascade down the back of suit jacket)
-    const hairBackGeo2 = new THREE.BoxGeometry(0.26, 0.26, 0.06);
-    const hairBack2 = new THREE.Mesh(hairBackGeo2, hairMat);
-    hairBack2.position.set(0, -0.02, -0.135);
-    this.headGroup.add(hairBack2);
 
     // 5. Arms & Hands
     const armUpperGeo = new THREE.BoxGeometry(0.13, 0.28, 0.13);
@@ -383,8 +387,50 @@ export class TVACharacter {
   }
 
   setTargetPosition(x, z) {
-    this.targetX = x;
-    this.targetZ = z;
+    this.targetX = Math.max(-3.2, Math.min(3.2, x));
+    this.targetZ = Math.max(-60, Math.min(10.5, z));
+  }
+
+  // One discrete step on arrow click (Forward, Backward, Left, Right)
+  step(direction, distance = 1.35) {
+    let nextX = this.targetX;
+    let nextZ = this.targetZ;
+
+    if (direction === 'forward') {
+      nextZ -= distance; // Walk forward down the corridor (-Z)
+      this.targetAngle = Math.PI;
+    } else if (direction === 'backward') {
+      nextZ += distance; // Walk backward towards entrance (+Z)
+      this.targetAngle = 0;
+    } else if (direction === 'left') {
+      nextX -= distance; // Walk left (-X)
+      this.targetAngle = -Math.PI / 2;
+    } else if (direction === 'right') {
+      nextX += distance; // Walk right (+X)
+      this.targetAngle = Math.PI / 2;
+    }
+
+    // World collision bounds
+    this.targetX = Math.max(-3.2, Math.min(3.2, nextX));
+    this.targetZ = Math.max(-60, Math.min(10.5, nextZ));
+    this.stepCount++;
+
+    soundEngine.playFootstep();
+    return { x: this.targetX, z: this.targetZ, stepCount: this.stepCount };
+  }
+
+  // Continuous movement when keys/buttons are held down
+  walkVelocity(vx, vz, delta, speed = 4.6) {
+    if (Math.abs(vx) < 0.01 && Math.abs(vz) < 0.01) return;
+
+    const nextX = this.targetX + vx * speed * delta;
+    const nextZ = this.targetZ + vz * speed * delta;
+
+    this.targetX = Math.max(-3.2, Math.min(3.2, nextX));
+    this.targetZ = Math.max(-60, Math.min(10.5, nextZ));
+
+    // Dynamic heading angle
+    this.targetAngle = Math.atan2(vx, vz);
   }
 
   update(delta, time) {
@@ -392,36 +438,42 @@ export class TVACharacter {
     const distZ = this.targetZ - this.currentZ;
     const distance = Math.sqrt(distX * distX + distZ * distZ);
 
-    if (distance > 0.05) {
+    if (distance > 0.04) {
       this.isWalking = true;
-      const stepFactor = Math.min(delta * 4.2, 0.28);
+      const stepFactor = Math.min(delta * 5.2, 0.35);
       this.currentX += distX * stepFactor;
       this.currentZ += distZ * stepFactor;
       this.group.position.x = this.currentX;
       this.group.position.z = this.currentZ;
 
       // Face walking direction
-      const targetAngle = Math.atan2(distX, distZ);
-      this.turnAngle = THREE.MathUtils.lerp(this.turnAngle, targetAngle, delta * 6);
+      const moveAngle = Math.atan2(distX, distZ);
+      this.turnAngle = THREE.MathUtils.lerp(this.turnAngle, moveAngle, delta * 8);
       this.group.rotation.y = this.turnAngle;
     } else {
       this.isWalking = false;
-      // When stationary, face slightly forward (-Z direction) or towards viewer
-      this.turnAngle = THREE.MathUtils.lerp(this.turnAngle, 0, delta * 4);
+      // Preserve current heading or smooth towards targetAngle
+      this.turnAngle = THREE.MathUtils.lerp(this.turnAngle, this.targetAngle, delta * 4);
       this.group.rotation.y = this.turnAngle;
     }
 
     if (this.isWalking) {
-      this.walkCycle += delta * 7.8;
-      const legAngle = Math.sin(this.walkCycle) * 0.6;
-      const armAngle = Math.sin(this.walkCycle) * 0.52;
+      this.walkCycle += delta * 8.5;
+      const legAngle = Math.sin(this.walkCycle) * 0.65;
+      const armAngle = Math.sin(this.walkCycle) * 0.55;
+
+      // Footstep audio timing (when leg crosses center)
+      if (Math.abs(Math.sin(this.walkCycle)) > 0.95 && time - this.lastFootstep > 0.28) {
+        soundEngine.playFootstep();
+        this.lastFootstep = time;
+      }
 
       this.leftLeg.rotation.x = legAngle;
       this.rightLeg.rotation.x = -legAngle;
 
       // Knee bend physics
-      this.leftShinGroup.rotation.x = legAngle > 0 ? legAngle * 0.6 : 0;
-      this.rightShinGroup.rotation.x = -legAngle > 0 ? -legAngle * 0.6 : 0;
+      this.leftShinGroup.rotation.x = legAngle > 0 ? legAngle * 0.65 : 0;
+      this.rightShinGroup.rotation.x = -legAngle > 0 ? -legAngle * 0.65 : 0;
 
       // Natural arm swing with slight forearm bend
       this.leftArm.rotation.x = -armAngle;
@@ -430,7 +482,7 @@ export class TVACharacter {
       this.rightForearm.rotation.x = Math.max(0, armAngle * 0.4);
 
       // Pelvis bounce and torso sway
-      this.pelvis.position.y = 0.92 + Math.abs(Math.sin(this.walkCycle * 2)) * 0.045;
+      this.pelvis.position.y = 0.92 + Math.abs(Math.sin(this.walkCycle * 2)) * 0.05;
       this.torso.rotation.y = Math.sin(this.walkCycle) * 0.08;
       this.headGroup.rotation.y = -Math.sin(this.walkCycle) * 0.04;
     } else {

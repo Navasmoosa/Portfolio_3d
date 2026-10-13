@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import {
   Clock,
@@ -16,10 +16,12 @@ import MissMinutesDialogue from './components/ui/MissMinutesDialogue';
 import StationOverlay from './components/ui/StationOverlay';
 import AppShowcaseModal from './components/ui/AppShowcaseModal';
 import TVACaseFileModal from './components/ui/TVACaseFileModal';
+import OpenWorldController from './components/ui/OpenWorldController';
 import { STATIONS, PERSONAL_INFO } from './data/portfolioData';
 import { soundEngine } from './utils/SoundEffects';
 
 export default function App() {
+  const worldRef = useRef(null);
   const [currentStationIndex, setCurrentStationIndex] = useState(0);
   const [isAutoTour, setIsAutoTour] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -27,6 +29,14 @@ export default function App() {
   const [showCaseFile, setShowCaseFile] = useState(false);
   const [isTalking, setIsTalking] = useState(false);
   const [showHelpGuide, setShowHelpGuide] = useState(false);
+  const [playerTelemetry, setPlayerTelemetry] = useState({
+    x: 0,
+    z: 8,
+    stepCount: 0,
+    isNearStation: true,
+    distanceToStation: 0,
+    activeStationIndex: 0,
+  });
 
   // Trigger celebration confetti at Nexus or Closing
   const triggerCelebration = useCallback(() => {
@@ -42,14 +52,14 @@ export default function App() {
     }
   }, []);
 
-  // Station Change handler
+  // Station Change handler (invoked when walking into a station or clicking HUD)
   const handleStationChange = useCallback(
     (newIndex) => {
       if (newIndex >= 0 && newIndex < STATIONS.length) {
         setCurrentStationIndex(newIndex);
         setIsTalking(true);
 
-        // Reset talking state after initial speech burst
+        // Guide speech chime
         setTimeout(() => setIsTalking(false), 3000);
 
         if (newIndex === 5 || newIndex === 6) {
@@ -60,7 +70,25 @@ export default function App() {
     [triggerCelebration]
   );
 
-  // Auto Tour Timer
+  // Manual Quick Travel via HUD dots or Prev/Next
+  const handleManualStationSelect = useCallback(
+    (newIndex) => {
+      if (worldRef.current) {
+        worldRef.current.teleportToStation(newIndex);
+      }
+      handleStationChange(newIndex);
+    },
+    [handleStationChange]
+  );
+
+  // Step movement dispatcher
+  const handleStep = useCallback((direction) => {
+    if (worldRef.current) {
+      worldRef.current.step(direction);
+    }
+  }, []);
+
+  // Auto Tour Timer (Walks character from station to station)
   useEffect(() => {
     let timer;
     if (isAutoTour) {
@@ -70,14 +98,18 @@ export default function App() {
             setIsAutoTour(false);
             return prev;
           }
-          return prev + 1;
+          const next = prev + 1;
+          if (worldRef.current) {
+            worldRef.current.teleportToStation(next);
+          }
+          return next;
         });
       }, 7500);
     }
     return () => clearInterval(timer);
   }, [isAutoTour]);
 
-  // Keyboard navigation & Wheel Scroll controls
+  // Keyboard navigation & Wheel Scroll controls (Arrow Keys / WASD = Walking)
   useEffect(() => {
     let lastWheelTime = 0;
 
@@ -85,14 +117,18 @@ export default function App() {
       // Don't intercept if typing in modal input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
         e.preventDefault();
-        soundEngine.playTemPadClick();
-        handleStationChange(Math.min(currentStationIndex + 1, STATIONS.length - 1));
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        handleStep('forward');
+      } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
         e.preventDefault();
-        soundEngine.playTemPadClick();
-        handleStationChange(Math.max(currentStationIndex - 1, 0));
+        handleStep('backward');
+      } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        e.preventDefault();
+        handleStep('left');
+      } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        e.preventDefault();
+        handleStep('right');
       } else if (e.key.toLowerCase() === 'm') {
         const muted = soundEngine.toggleMute();
         setIsMuted(muted);
@@ -106,16 +142,16 @@ export default function App() {
     };
 
     const handleWheel = (e) => {
-      // Throttle wheel scroll
+      // Throttle wheel scroll into steps
       const now = Date.now();
-      if (now - lastWheelTime < 600) return;
+      if (now - lastWheelTime < 240) return;
 
-      if (Math.abs(e.deltaY) > 30) {
+      if (Math.abs(e.deltaY) > 25) {
         lastWheelTime = now;
         if (e.deltaY > 0) {
-          handleStationChange(Math.min(currentStationIndex + 1, STATIONS.length - 1));
+          handleStep('forward');
         } else {
-          handleStationChange(Math.max(currentStationIndex - 1, 0));
+          handleStep('backward');
         }
       }
     };
@@ -127,22 +163,22 @@ export default function App() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('wheel', handleWheel);
     };
-  }, [currentStationIndex, handleStationChange]);
+  }, [handleStep]);
 
   return (
     <main className="app-container">
-      {/* 1. TVA CRT Scanlines & Vignette */}
+      {/* 1. CRT Scanlines & Vignette */}
       <div className="crt-overlay" />
       <div className="tva-vignette" />
 
-      {/* 2. TVA Top Header Bar */}
+      {/* 2. Top Header Bar */}
       <header className="tva-header-bar">
         <div className="tva-logo-wrap">
-          <div className="tva-logo-badge">TVA</div>
+          <div className="tva-logo-badge">NM</div>
           <div className="tva-title-info">
             <h1 className="tva-main-title">{PERSONAL_INFO.name}</h1>
             <span className="tva-sub-title">
-              TIME VARIANCE AUTHORITY ARCHIVES • {PERSONAL_INFO.title}
+              OPEN-WORLD 3D PORTFOLIO • {PERSONAL_INFO.title}
             </span>
           </div>
         </div>
@@ -170,26 +206,27 @@ export default function App() {
             title="Navigation Guide"
           >
             <HelpCircle size={15} />
-            <span className="btn-label-desktop">TVA Guide</span>
+            <span className="btn-label-desktop">User Guide</span>
           </button>
 
-          {/* Open Dossier */}
+          {/* Open Resume */}
           <button
             onClick={() => {
               soundEngine.playTemPadClick();
               setShowCaseFile(true);
             }}
             className="tva-btn tva-btn-primary"
-            title="Open Confidential TVA Case-File"
+            title="View and Download Resume"
           >
             <FileText size={15} />
-            <span>Case-File</span>
+            <span>Resume</span>
           </button>
         </div>
       </header>
 
-      {/* 3. 3D WebGL Canvas TVA World */}
+      {/* 3. 3D WebGL Canvas TVA World with Open-World Walking Locomotion */}
       <TVAWorld
+        ref={worldRef}
         currentStationIndex={currentStationIndex}
         onStationChange={handleStationChange}
         onAppSelect={(appId) => {
@@ -197,13 +234,21 @@ export default function App() {
           setSelectedApp(appId);
         }}
         isTalking={isTalking}
+        onPlayerTelemetry={setPlayerTelemetry}
       />
 
-      {/* 4. Miss Minutes Floating Interactive Dialogue Card */}
+      {/* 4. On-Screen Virtual D-Pad & Waypoint Quest Tracker */}
+      <OpenWorldController
+        onStep={handleStep}
+        playerTelemetry={playerTelemetry}
+        currentStationIndex={currentStationIndex}
+      />
+
+      {/* 5. Miss Minutes Floating Companion Dialogue Card */}
       <MissMinutesDialogue
         currentStationIndex={currentStationIndex}
         onNextStation={() =>
-          handleStationChange(Math.min(currentStationIndex + 1, STATIONS.length - 1))
+          handleManualStationSelect(Math.min(currentStationIndex + 1, STATIONS.length - 1))
         }
         onAppSelect={(appId) => {
           soundEngine.playTemPadClick();
@@ -215,7 +260,7 @@ export default function App() {
         }}
       />
 
-      {/* 5. Contextual Station Information Overlay (Left / Bottom-Left) */}
+      {/* 6. Contextual Station Information Overlay (Left / Bottom-Left) */}
       <StationOverlay
         currentStationIndex={currentStationIndex}
         onAppSelect={(appId) => {
@@ -226,12 +271,13 @@ export default function App() {
           soundEngine.playTemPadClick();
           setShowCaseFile(true);
         }}
+        playerTelemetry={playerTelemetry}
       />
 
-      {/* 6. Bottom Floating TemPad HUD Controller */}
+      {/* 7. Bottom Floating HUD Controller (With Quick Travel & Audio) */}
       <TemPadHUD
         currentStationIndex={currentStationIndex}
-        onStationSelect={handleStationChange}
+        onStationSelect={handleManualStationSelect}
         isAutoTour={isAutoTour}
         onToggleAutoTour={() => setIsAutoTour(!isAutoTour)}
         isMuted={isMuted}
@@ -239,7 +285,7 @@ export default function App() {
         onOpenCaseFile={() => setShowCaseFile(true)}
       />
 
-      {/* 7. App Showcase Modal (CampusFix, PocketTask, Disaster Management) */}
+      {/* 8. App Showcase Modal (Disaster Management) */}
       {selectedApp && (
         <AppShowcaseModal
           appId={selectedApp}
@@ -247,33 +293,35 @@ export default function App() {
         />
       )}
 
-      {/* 8. Confidential TVA Case-File Dossier Modal */}
+      {/* 9. Resume / Curriculum Vitae Modal */}
       {showCaseFile && (
         <TVACaseFileModal onClose={() => setShowCaseFile(false)} />
       )}
 
-      {/* 9. Help / Keyboard Guide Modal */}
+      {/* 10. Help / Keyboard Guide Modal */}
       {showHelpGuide && (
         <div className="help-modal-backdrop" onClick={() => setShowHelpGuide(false)}>
           <div className="tva-panel help-card" onClick={(e) => e.stopPropagation()}>
             <div className="help-header">
-              <span className="card-badge">TVA TEMPAD FIELD MANUAL</span>
-              <h3>How To Navigate Navas Moosa's 3D Timeline</h3>
+              <span className="card-badge">OPEN-WORLD GAME NAVIGATION GUIDE</span>
+              <h3>How To Explore Navas Moosa's 3D World</h3>
             </div>
             <ul className="help-list">
-              <li><strong>Scroll Wheel or Trackpad:</strong> Walk forward and backward through the TVA brutalist corridor.</li>
-              <li><strong>Arrow Keys / Spacebar:</strong> Step between the 10 timeline stations.</li>
-              <li><strong>Miss Minutes:</strong> Your personal TVA mentor floating on air! Listen to her voice and click her action buttons.</li>
-              <li><strong>3D Holographic Phones:</strong> Click directly on the floating 3D phones to test <em>CampusFix</em> and <em>PocketTask</em>.</li>
-              <li><strong>Case-File Button:</strong> Open the official confidential dossier to review and print Navas's complete resume.</li>
+              <li><strong>Arrow Keys (↑, ↓, ←, →) or (W, A, S, D):</strong> Click once to move 1 step forward, backward, left, or right! Hold down for continuous walking.</li>
+              <li><strong>Virtual D-Pad Controls:</strong> Click the on-screen Directional buttons in the bottom right to step in any direction.</li>
+              <li><strong>7 Station Destinations:</strong> Walk along the corridor to discover Scene 1 (Welcome), Scene 2 (About Me), Scene 3 (Experience), Scene 4 (Projects), Scene 5 (Skills), Scene 6 (Contact), and Scene 7 (Thank You)!</li>
+              <li><strong>Arrival Checkpoint Pads:</strong> Step onto the glowing circular waypoint pads on the floor at each station to unlock details.</li>
+              <li><strong>Miss Minutes Companion:</strong> Hovers alongside you as you walk, and explains each station when you arrive!</li>
+              <li><strong>Interactive 3D Demos:</strong> Click directly on the floating device consoles in Scene 4 to test the interactive <em>Disaster Management System</em> demo.</li>
+              <li><strong>Resume Button:</strong> View and print Navas's complete resume PDF anytime.</li>
               <li><strong>'T' Key:</strong> Toggle Auto-Tour mode for a hands-free cinematic walkthrough.</li>
-              <li><strong>'M' Key:</strong> Toggle TVA sound synthesizer effects.</li>
+              <li><strong>'M' Key:</strong> Toggle ambient sound and footsteps.</li>
             </ul>
             <button
               onClick={() => setShowHelpGuide(false)}
               className="tva-btn tva-btn-primary full-btn"
             >
-              Understood, Return To Timeline
+              Understood, Start Exploring
             </button>
           </div>
         </div>
@@ -293,7 +341,7 @@ export default function App() {
         }
 
         .help-card {
-          width: 500px;
+          width: 520px;
           max-width: 100%;
           padding: 24px;
           border-radius: 12px;

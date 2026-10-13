@@ -49,7 +49,7 @@ export default function TemPadHUD({
       <div className="tempad-top-strip">
         <div className="tempad-sector-badge">
           <Compass size={14} className="text-amber-400" />
-          <span>SECTOR {currentStation.stepNumber} OF {STATIONS.length}</span>
+          <span>SECTION {currentStation.stepNumber} OF {STATIONS.length}</span>
           <span className="separator">•</span>
           <span className="station-name-glow">{currentStation.title}</span>
         </div>
@@ -63,7 +63,7 @@ export default function TemPadHUD({
                 key={station.id}
                 onClick={() => handleSelect(idx)}
                 className={`station-dot-btn ${isActive ? 'active' : ''}`}
-                title={`Sector ${station.stepNumber}: ${station.title}`}
+                title={`Section ${station.stepNumber}: ${station.title}`}
               >
                 <span className="dot-number">{station.stepNumber}</span>
               </button>
@@ -80,7 +80,7 @@ export default function TemPadHUD({
             onClick={handlePrev}
             disabled={currentStationIndex === 0}
             className="tva-btn tempad-step-btn"
-            title="Previous Timeline Station"
+            title="Previous Section"
           >
             <ChevronLeft size={18} />
             <span className="btn-label-desktop">PREV</span>
@@ -90,7 +90,7 @@ export default function TemPadHUD({
             onClick={handleNext}
             disabled={currentStationIndex === STATIONS.length - 1}
             className="tva-btn tva-btn-primary tempad-step-btn"
-            title="Next Timeline Station"
+            title="Next Section"
           >
             <span className="btn-label-desktop">NEXT</span>
             <ChevronRight size={18} />
@@ -107,7 +107,7 @@ export default function TemPadHUD({
             className={`tva-btn tour-toggle-btn ${isAutoTour ? 'active-tour' : ''}`}
           >
             {isAutoTour ? <Pause size={16} /> : <Play size={16} />}
-            <span>{isAutoTour ? 'PAUSE AUTO-TOUR' : 'PLAY TIMELINE TOUR'}</span>
+            <span>{isAutoTour ? 'PAUSE AUTO-TOUR' : 'PLAY GUIDED TOUR'}</span>
             {isAutoTour && <span className="pulsing-recording-dot" />}
           </button>
         </div>
@@ -121,7 +121,7 @@ export default function TemPadHUD({
               onToggleMute(muted);
             }}
             className="tva-btn audio-btn"
-            title={isMuted ? 'Unmute TVA Sounds' : 'Mute Sounds'}
+            title={isMuted ? 'Unmute Sound Effects' : 'Mute Sounds'}
           >
             {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} className="text-amber-400" />}
           </button>
@@ -133,10 +133,10 @@ export default function TemPadHUD({
               onOpenCaseFile();
             }}
             className="tva-btn casefile-btn"
-            title="Open TVA Confidential Dossier & Resume"
+            title="View Resume / Portfolio CV"
           >
             <div className="wax-seal-mini" />
-            <span className="casefile-text">CASE-FILE: N. MOOSA</span>
+            <span className="casefile-text">RESUME: N. MOOSA</span>
             <FileText size={16} className="text-amber-300" />
           </button>
         </div>

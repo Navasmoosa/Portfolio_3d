@@ -34,7 +34,7 @@ export default function TVACaseFileModal({ onClose }) {
         <div className="casefile-header no-print">
           <div className="header-tag">
             <span className="wax-badge" />
-            <span>TVA TOP SECRET ARCHIVAL DOSSIER // CLASSIFICATION ALPHA</span>
+            <span>PROFESSIONAL RESUME // CURRICULUM VITAE</span>
           </div>
 
           <div className="header-actions">
@@ -53,7 +53,7 @@ export default function TVACaseFileModal({ onClose }) {
                 onClose();
               }}
               className="tva-btn"
-              title="Close Dossier"
+              title="Close Resume"
             >
               <X size={18} />
             </button>
@@ -65,12 +65,12 @@ export default function TVACaseFileModal({ onClose }) {
           {/* Top Folder Banner */}
           <div className="folder-top-banner">
             <div className="folder-stamps">
-              <span className="stamp red-stamp">CONFIDENTIAL</span>
-              <span className="stamp black-stamp">CASE #6690</span>
-              <span className="stamp green-stamp">APPROVED BY O.B.</span>
+              <span className="stamp green-stamp">VERIFIED RESUME</span>
+              <span className="stamp black-stamp">PORTFOLIO CV</span>
+              <span className="stamp red-stamp">OPEN FOR HIRE</span>
             </div>
             <div className="file-number">
-              FILE NO: <strong>TVA-88019-KP</strong> • TIMELINE: <strong>EARTH-616</strong>
+              CANDIDATE: <strong>NAVAS MOOSA K P</strong> • LOCATION: <strong>KOZHIKODE, KERALA</strong>
             </div>
           </div>
 
@@ -79,7 +79,7 @@ export default function TVACaseFileModal({ onClose }) {
             <div className="candidate-info">
               <h1 className="candidate-name">{PERSONAL_INFO.name}</h1>
               <p className="candidate-role">{PERSONAL_INFO.title}</p>
-              
+
               <div className="candidate-contacts">
                 <span><MapPin size={12} /> {PERSONAL_INFO.address}</span>
                 <span><Phone size={12} /> {PERSONAL_INFO.phone}</span>
@@ -108,7 +108,7 @@ export default function TVACaseFileModal({ onClose }) {
 
           {/* Professional Summary */}
           <section className="dossier-section">
-            <h3 className="section-heading">I. EXECUTIVE TIMELINE SUMMARY</h3>
+            <h3 className="section-heading">I. PROFESSIONAL SUMMARY</h3>
             <p className="summary-paragraph">
               {PERSONAL_INFO.summary}
             </p>
@@ -116,7 +116,7 @@ export default function TVACaseFileModal({ onClose }) {
 
           {/* Education */}
           <section className="dossier-section">
-            <h3 className="section-heading">II. CERTIFIED EDUCATION & CREDENTIALS</h3>
+            <h3 className="section-heading">II. EDUCATION & ACADEMIC BACKGROUND</h3>
             <div className="edu-list">
               {EDUCATION_DATA.map((item, idx) => (
                 <div key={idx} className="edu-entry">
@@ -135,7 +135,7 @@ export default function TVACaseFileModal({ onClose }) {
 
           {/* Technical Skills */}
           <section className="dossier-section">
-            <h3 className="section-heading">III. TECHNICAL COMPETENCIES & WEAPONRY</h3>
+            <h3 className="section-heading">III. TECHNICAL SKILLS & COMPETENCIES</h3>
             <div className="skills-grid">
               <div>
                 <strong>Languages & Frameworks:</strong>
@@ -158,29 +158,11 @@ export default function TVACaseFileModal({ onClose }) {
 
           {/* Featured Projects */}
           <section className="dossier-section">
-            <h3 className="section-heading">IV. PRUNED HISTORIES & FEATURED PROJECTS</h3>
-            
-            {/* CampusFix */}
-            <div className="project-entry">
-              <div className="project-head">
-                <span className="entry-title">CampusFix — Campus Maintenance & Incident Management</span>
-                <span className="tech-badge">React.js, Node.js, Express, PostgreSQL</span>
-              </div>
-              <p className="project-desc">
-                Integrated incident triage platform for universities. Enables student incident geotagging, priority management, and field technician dispatch under 15 minutes.
-              </p>
-            </div>
+            <h3 className="section-heading">IV. FEATURED PROJECTS & APPLICATIONS</h3>
 
-            {/* PocketTask */}
-            <div className="project-entry">
-              <div className="project-head">
-                <span className="entry-title">PocketTask — Crowdsourced Micro-Task Platform</span>
-                <span className="tech-badge">React, Python FastAPI, MongoDB</span>
-              </div>
-              <p className="project-desc">
-                High-speed micro-survey and dataset quality verification platform with anti-cheat verification mechanisms and instant reward ledger.
-              </p>
-            </div>
+
+
+
 
             {/* Disaster Management System */}
             <div className="project-entry">
@@ -196,7 +178,7 @@ export default function TVACaseFileModal({ onClose }) {
 
           {/* Additional Experience & Links */}
           <section className="dossier-section">
-            <h3 className="section-heading">V. FIELD EXPERIENCE & INDUSTRIAL CLEARANCE</h3>
+            <h3 className="section-heading">V. WORK EXPERIENCE & INDUSTRIAL EXPOSURE</h3>
             <p className="summary-paragraph">
               <strong>Industrial Visit:</strong> Cyberpark Calicut Techne Industry — Hands-on exposure to enterprise software pipelines, devops, and industry-grade engineering environments.
             </p>
@@ -205,13 +187,13 @@ export default function TVACaseFileModal({ onClose }) {
           {/* Official Sign-off Stamp */}
           <div className="dossier-footer">
             <div className="seal-signature">
-              <span className="approved-text">VERIFIED AND SEALED BY TIME VARIANCE AUTHORITY</span>
-              <span className="sacred-motto">"FOR ALL TIME. ALWAYS."</span>
+              <span className="approved-text">VERIFIED PROFESSIONAL RESUME • NAVAS MOOSA K P</span>
+              <span className="sacred-motto">"FULL-STACK DEVELOPER • READY FOR COLLABORATION"</span>
             </div>
-            <div className="tva-wax-stamp">TVA CERTIFIED</div>
+            <div className="tva-wax-stamp">VERIFIED CV</div>
           </div>
         </div>
-      </div>
+      </div >
 
       <style>{`
         .casefile-modal-backdrop {
@@ -574,6 +556,6 @@ export default function TVACaseFileModal({ onClose }) {
           }
         }
       `}</style>
-    </div>
+    </div >
   );
 }

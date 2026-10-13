@@ -55,7 +55,7 @@ export default function AppShowcaseModal({ appId, onClose }) {
         {/* Modal Top Bar */}
         <div className="modal-header">
           <div className="modal-title-group">
-            <span className="modal-case-tag">TVA MISSION ARCHIVE // LIVE SHOWCASE</span>
+            <span className="modal-case-tag">PROJECT PORTFOLIO // LIVE SHOWCASE</span>
             <h2 className="modal-app-title">{app.title}</h2>
             <span className="modal-app-tagline">{app.tagline}</span>
           </div>
@@ -79,7 +79,7 @@ export default function AppShowcaseModal({ appId, onClose }) {
             <div className="device-frame">
               {/* Device Status Bar */}
               <div className="device-status-bar">
-                <span>TVA SIMULATOR 5G</span>
+                <span>LIVE PREVIEW 5G</span>
                 <span>10:10</span>
                 <span>100%</span>
               </div>
@@ -108,214 +108,6 @@ export default function AppShowcaseModal({ appId, onClose }) {
 
               {/* Device Interactive Screen Area */}
               <div className="device-screen-content">
-                {/* CAMPUSFIX SCREENS */}
-                {appId === 'campusfix' && (
-                  <div className="screen-inner">
-                    {activeTab === 'report' && (
-                      <div className="demo-flow">
-                        <h4>Submit Campus Incident</h4>
-                        <p className="flow-desc">Log facility faults, lab issues, or security concerns directly.</p>
-                        
-                        {ticketSubmitted ? (
-                          <div className="success-alert">
-                            <CheckCircle size={24} className="text-green-400" />
-                            <strong>Ticket #CF-9042 Created!</strong>
-                            <span>Dispatched to Electrical & IT Maintenance Team.</span>
-                          </div>
-                        ) : (
-                          <form onSubmit={handleFormSubmit} className="demo-form">
-                            <label>Incident Category</label>
-                            <select
-                              value={selectedCategory}
-                              onChange={(e) => setSelectedCategory(e.target.value)}
-                              className="demo-input"
-                            >
-                              <option>Wi-Fi / Network Glitch</option>
-                              <option>Lab Equipment Breakdown</option>
-                              <option>Power & AC Fault</option>
-                              <option>Plumbing & Hygiene</option>
-                            </select>
-
-                            <label>Location / Room</label>
-                            <input
-                              type="text"
-                              defaultValue="Block C - Computer Lab 402"
-                              className="demo-input"
-                            />
-
-                            <label>Description</label>
-                            <textarea
-                              defaultValue="Switch port 12 packet drops causing delay during practical exam."
-                              rows={2}
-                              className="demo-input"
-                            />
-
-                            <button type="submit" className="tva-btn tva-btn-primary form-submit-btn">
-                              <Send size={14} />
-                              <span>Submit Priority Ticket</span>
-                            </button>
-                          </form>
-                        )}
-                      </div>
-                    )}
-
-                    {activeTab === 'management' && (
-                      <div className="demo-flow">
-                        <h4>Admin Triage Dashboard</h4>
-                        <div className="triage-list">
-                          <div className="triage-card urgent">
-                            <div className="triage-head">
-                              <span className="triage-id">#CF-9041</span>
-                              <span className="badge-urgent">URGENT</span>
-                            </div>
-                            <span className="triage-title">Server Room AC Unit Overheating</span>
-                            <span className="triage-meta">Assigned: Tech Rahul V. • 12m ago</span>
-                          </div>
-
-                          <div className="triage-card in-progress">
-                            <div className="triage-head">
-                              <span className="triage-id">#CF-9040</span>
-                              <span className="badge-progress">IN PROGRESS</span>
-                            </div>
-                            <span className="triage-title">Seminar Hall Projector HDMI Port Damaged</span>
-                            <span className="triage-meta">Assigned: Tech Niyas K. • 45m ago</span>
-                          </div>
-
-                          <div className="triage-card resolved">
-                            <div className="triage-head">
-                              <span className="triage-id">#CF-9038</span>
-                              <span className="badge-resolved">RESOLVED</span>
-                            </div>
-                            <span className="triage-title">Library Wi-Fi Mesh AP 3 Reboot</span>
-                            <span className="triage-meta">Verified by Admin • 2h ago</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeTab === 'technician' && (
-                      <div className="demo-flow">
-                        <h4>Technician Field Dispatch</h4>
-                        <div className="tech-job-card">
-                          <div className="job-badge">ASSIGNED TO YOU</div>
-                          <h5>Lab 402 Network Gateway Repair</h5>
-                          <div className="job-details">
-                            <div><strong>Priority:</strong> High (Class in session)</div>
-                            <div><strong>Target ETA:</strong> Under 15 Minutes</div>
-                            <div><strong>Required Tools:</strong> Cat6 Cable, Crimper, Fluke Tester</div>
-                          </div>
-                          <button
-                            onClick={() => soundEngine.playTemPadClick()}
-                            className="tva-btn tva-btn-primary full-btn"
-                          >
-                            <CheckCircle size={14} />
-                            <span>Acknowledge & Mark On-Site</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* POCKETTASK SCREENS */}
-                {appId === 'pockettask' && (
-                  <div className="screen-inner">
-                    {activeTab === 'survey' && (
-                      <div className="demo-flow">
-                        <h4>Micro-Survey Verification</h4>
-                        <p className="flow-desc">Earn tokens by validating AI model outputs and datasets.</p>
-
-                        {surveyAnswered ? (
-                          <div className="success-alert">
-                            <Award size={24} className="text-purple-400" />
-                            <strong>Task Validated! +50 Credits</strong>
-                            <span>Credited to user ledger instantly.</span>
-                          </div>
-                        ) : (
-                          <div className="survey-card">
-                            <p className="survey-question">
-                              "Does this web design layout adhere to TVA aesthetic guidelines?"
-                            </p>
-                            <div className="survey-options">
-                              <button
-                                onClick={() => {
-                                  soundEngine.playChronoChime();
-                                  setSurveyAnswered(true);
-                                  setTimeout(() => setSurveyAnswered(false), 3500);
-                                }}
-                                className="survey-opt-btn"
-                              >
-                                <span>A. Absolutely, perfect bronze & amber tones</span>
-                              </button>
-                              <button
-                                onClick={() => {
-                                  soundEngine.playChronoChime();
-                                  setSurveyAnswered(true);
-                                  setTimeout(() => setSurveyAnswered(false), 3500);
-                                }}
-                                className="survey-opt-btn"
-                              >
-                                <span>B. Exceeds Sacred Timeline standards</span>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {activeTab === 'data_entry' && (
-                      <div className="demo-flow">
-                        <h4>OCR Data Label Validation</h4>
-                        <div className="data-check-box">
-                          <span className="raw-text">SCANNED RECEIPT: #TVA-10928</span>
-                          <div className="extracted-fields">
-                            <div>Amount: $1,420.00</div>
-                            <div>Vendor: Chrono Dynamics Ltd.</div>
-                            <div>Status: Verification Passed</div>
-                          </div>
-                          <button
-                            onClick={() => soundEngine.playTemPadClick()}
-                            className="tva-btn full-btn"
-                          >
-                            <span>Confirm & Approve Data</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeTab === 'app_training' && (
-                      <div className="demo-flow">
-                        <h4>QA App Regression Suite</h4>
-                        <div className="qa-check-list">
-                          <div className="qa-row checked">✓ Viewport resize responsive check</div>
-                          <div className="qa-row checked">✓ Three.js WebGL canvas context recovery</div>
-                          <div className="qa-row checked">✓ Zero console memory leaks</div>
-                          <div className="qa-row checked">✓ Accessible navigation landmarks</div>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeTab === 'micro_earners' && (
-                      <div className="demo-flow">
-                        <h4>Micro Earners Leaderboard</h4>
-                        <div className="earner-list">
-                          <div className="earner-row">
-                            <span>1. Variant_Loki_9</span>
-                            <span className="text-amber-400">4,920 Pts (12 Streak)</span>
-                          </div>
-                          <div className="earner-row">
-                            <span>2. Navas_Moosa</span>
-                            <span className="text-amber-400">4,850 Pts (Top Dev)</span>
-                          </div>
-                          <div className="earner-row">
-                            <span>3. Mobius_M</span>
-                            <span className="text-amber-400">3,400 Pts (JetSki Fund)</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
 
                 {/* DISASTER MANAGEMENT SCREENS */}
                 {appId === 'disaster' && (
@@ -437,7 +229,7 @@ export default function AppShowcaseModal({ appId, onClose }) {
                 }}
                 className="tva-btn full-btn"
               >
-                <span>Return To TVA Walking Tour</span>
+                <span>Return To 3D Tour</span>
               </button>
             </div>
           </div>

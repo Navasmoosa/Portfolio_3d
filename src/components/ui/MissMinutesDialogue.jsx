@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, MessageSquare, ChevronRight, X, Volume2, ExternalLink, FileText } from 'lucide-react';
-import { STATIONS, PERSONAL_INFO } from '../../data/portfolioData';
+import { STATIONS, PERSONAL_INFO, APPS_DATA } from '../../data/portfolioData';
 import { soundEngine } from '../../utils/SoundEffects';
 
 export default function MissMinutesDialogue({
@@ -43,7 +43,7 @@ export default function MissMinutesDialogue({
 
   return (
     <aside
-      aria-label="Miss Minutes TVA Holographic Mentoring Box"
+      aria-label="Interactive Virtual Guide Box"
       className={`miss-minutes-card ${isMinimized ? 'minimized' : ''}`}
     >
       {/* Header with Miss Minutes Hologram Avatar */}
@@ -60,15 +60,15 @@ export default function MissMinutesDialogue({
         <div className="mm-identity">
           <div className="mm-name-row">
             <span className="mm-name">MISS MINUTES</span>
-            <span className="mm-badge">TVA MENTOR</span>
+            <span className="mm-badge">PORTFOLIO GUIDE</span>
           </div>
-          <span className="mm-role">Chief Guide • Navas Variance Authority</span>
+          <span className="mm-role">Virtual Portfolio Assistant</span>
         </div>
 
         <button
           onClick={() => setIsMinimized(!isMinimized)}
           className="mm-toggle-btn"
-          title={isMinimized ? 'Expand Miss Minutes' : 'Minimize'}
+          title={isMinimized ? 'Expand Guide' : 'Minimize'}
         >
           {isMinimized ? <MessageSquare size={16} /> : <X size={16} />}
         </button>
@@ -80,7 +80,7 @@ export default function MissMinutesDialogue({
           <div className="mm-speech-bubble">
             <div className="mm-bubble-tag">
               <span className="tag-dot" />
-              <span>TRANSMISSION • SCENE {currentStation.stepNumber} OF {STATIONS.length}</span>
+              <span>GUIDE MESSAGE • SECTION {currentStation.stepNumber} OF {STATIONS.length}</span>
             </div>
             <p className="mm-text">
               {displayedText}
@@ -96,25 +96,37 @@ export default function MissMinutesDialogue({
                 className="tva-btn tva-btn-primary mm-action-btn"
               >
                 <FileText size={14} />
-                <span>View Full TVA Dossier</span>
+                <span>View Complete Resume</span>
               </button>
             )}
 
             {currentStation.id === 'projects' && (
               <>
-                <button
-                  onClick={() => onAppSelect('disaster')}
-                  className="tva-btn tva-btn-primary mm-action-btn"
-                >
-                  <Sparkles size={14} />
-                  <span>Disaster Mgmt</span>
-                </button>
-                <button
-                  onClick={() => onAppSelect('campusfix')}
-                  className="tva-btn mm-action-btn"
-                >
-                  <span>CampusFix</span>
-                </button>
+                {APPS_DATA?.disaster && (
+                  <button
+                    onClick={() => onAppSelect('disaster')}
+                    className="tva-btn tva-btn-primary mm-action-btn"
+                  >
+                    <Sparkles size={14} />
+                    <span>Disaster Demo</span>
+                  </button>
+                )}
+                {APPS_DATA?.campusfix && (
+                  <button
+                    onClick={() => onAppSelect('campusfix')}
+                    className="tva-btn mm-action-btn"
+                  >
+                    <span>CampusFix</span>
+                  </button>
+                )}
+                {APPS_DATA?.pockettask && (
+                  <button
+                    onClick={() => onAppSelect('pockettask')}
+                    className="tva-btn mm-action-btn"
+                  >
+                    <span>PocketTask</span>
+                  </button>
+                )}
               </>
             )}
 
@@ -145,10 +157,10 @@ export default function MissMinutesDialogue({
                 soundEngine.playMissMinutesVoice();
               }}
               className="tva-btn mm-voice-btn"
-              title="Hear Miss Minutes Voice Chime"
+              title="Play Audio Chime"
             >
               <Volume2 size={14} className="text-orange-400" />
-              <span>Twang</span>
+              <span>Chime</span>
             </button>
 
             {currentStationIndex < STATIONS.length - 1 && (
@@ -156,7 +168,7 @@ export default function MissMinutesDialogue({
                 onClick={onNextStation}
                 className="tva-btn mm-next-btn"
               >
-                <span>Walk with Loki</span>
+                <span>Continue Tour</span>
                 <ChevronRight size={14} />
               </button>
             )}
