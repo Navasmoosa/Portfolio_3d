@@ -43,10 +43,10 @@ export const STATIONS = [
   {
     id: "experience",
     stepNumber: 3,
-    title: "Experience & Practical Work",
-    subtitle: "Hands-on software development and engineering background",
-    quote: "Hands-on experience across full-stack ecosystems.",
-    missMinutesSpeech: "Here is Navas's hands-on background! He has experience developing clean React frontends, building RESTful APIs, optimizing relational databases, and studying real-world industry workflows at Cyberpark Calicut.",
+    title: "Experience",
+    subtitle: "R&D & GD Trainee – Cognilern",
+    quote: "Research & Development / Group Discussion Program",
+    missMinutesSpeech: "Here is Navas's hands-on experience! As an R&D & GD Trainee at Cognilern in their Research & Development / Group Discussion Program, he researched and designed a Smart Business Park Parking Management System automating entry, exit, and payment workflows.",
     accentColor: "#e5b342",
     cameraPos: { x: 0.3, y: 1.75, z: -8.5 },
     characterPos: { x: -0.3, y: 0, z: -12 },
@@ -126,6 +126,21 @@ export const EDUCATION_DATA = [
   }
 ];
 
+export const EXPERIENCE_DATA = [
+  {
+    role: "R&D & GD Trainee",
+    company: "Cognilern",
+    program: "Research & Development / Group Discussion Program",
+    badge: "R&D Trainee",
+    projectTitle: "Smart Business Park Parking Management System",
+    highlights: [
+      "Researched and designed a Smart Business Park Parking Management System automating entry, exit, and payment processes to provide employees with easy, efficient parking.",
+      "Built key features including real-time slot availability, online booking/cancellation, RFID/QR-based entry-exit, automatic fee calculation, authorized CCTV monitoring, and alerts.",
+      "Tackled operational problems including hard-to-find slots, long queues, unauthorized access, and manual record-keeping – improving security, transparency, and space utilization."
+    ]
+  }
+];
+
 export const SKILLS_DATA = {
   languagesAndFrameworks: [
     { name: "JavaScript (ES6+)", level: 95 },
@@ -161,7 +176,7 @@ export const SKILLS_DATA = {
     { name: "Arabic", level: "Basic / Reading" }
   ],
   interests: [
-    "Industrial Visit: Cyberpark Calicut Techne Industry",
+    "Smart Systems & Automation Architecture",
     "Cloud Architecture & Distributed Systems",
     "Creative WebGL & 3D Interactive UI"
   ]

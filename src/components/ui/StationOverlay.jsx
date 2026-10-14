@@ -17,10 +17,6 @@ import {
   FileText,
   Download,
   CheckCircle,
-  RotateCw,
-  Maximize2,
-  Eye,
-  X,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
@@ -28,11 +24,11 @@ import {
   PERSONAL_INFO,
   STATIONS,
   EDUCATION_DATA,
+  EXPERIENCE_DATA,
   SKILLS_DATA,
   APPS_DATA,
 } from '../../data/portfolioData';
 import { soundEngine } from '../../utils/SoundEffects';
-import AvatarViewer from '../avatar/AvatarViewer';
 
 const LinkedinIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -56,23 +52,7 @@ export default function StationOverlay({
 }) {
   const currentStation = STATIONS[currentStationIndex] || STATIONS[0];
 
-  // 3D Model interactive state
-  const [modelView, setModelView] = useState('float'); // 'float' | 'bust' | 'rear' | 'sheet'
-  const [inspectorMode, setInspectorMode] = useState('studio'); // 'studio' | 'reference'
-  const [cardTilt, setCardTilt] = useState({ x: 0, y: 0 });
-  const [is3DModalOpen, setIs3DModalOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const handleFrameMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 16;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -16;
-    setCardTilt({ x, y });
-  };
-
-  const handleFrameMouseLeave = () => {
-    setCardTilt({ x: 0, y: 0 });
-  };
 
   return (
     <div className="station-overlay-container">
@@ -158,54 +138,19 @@ export default function StationOverlay({
               <h2 className="section-title">About Navas Moosa K P</h2>
 
               <div className="aboutme-layout">
-                {/* 3D Model Interactive Showcase on Left Side */}
+                {/* Navas Moosa Avatar Face on Left Side */}
                 <div className="navas-3d-showcase">
-                  {/* Telemetry Header */}
-                  <div className="showcase-telemetry-bar">
-                    <span className="telemetry-live-dot" />
-                    <span className="telemetry-title">3D AVATAR // 360° ORBIT</span>
-                    <button
-                      type="button"
-                      className="telemetry-cycle-btn"
-                      title="Expand to Full 360° Studio Modal"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        soundEngine.playChronoChime();
-                        setIs3DModalOpen(true);
-                      }}
-                    >
-                      <Maximize2 size={11} />
-                    </button>
-                  </div>
-
-                  {/* Live Interactive 3D Avatar Viewport */}
-                  <div className="navas-avatar-embedded-wrap">
-                    <AvatarViewer
-                      isCompact={true}
-                      onExpand={() => setIs3DModalOpen(true)}
-                      initialView="front"
+                  <div className="navas-avatar-frame">
+                    <img
+                      src="/assets/navas_avatar_face.png"
+                      alt="Navas Moosa"
+                      className="navas-avatar-face-img"
                     />
-                  </div>
-
-                  {/* Caption & Specs */}
-                  <div className="navas-photo-caption">
-                    <div className="caption-tag-row">
-                      <span className="caption-tag">3D HUMAN AVATAR</span>
-                      <span className="caption-subtag">REAL-TIME 360°</span>
-                    </div>
-                    <span className="caption-title">NAVAS MOOSA • BESPOKE SUIT</span>
-                    <span className="caption-meta">PRESERVED REAL FACE • INTERACTIVE 3D</span>
-                    <button
-                      type="button"
-                      className="caption-inspect-btn"
-                      onClick={() => {
-                        soundEngine.playChronoChime();
-                        setIs3DModalOpen(true);
-                      }}
-                    >
-                      <Eye size={12} />
-                      <span>Inspect Full 360° Studio Asset</span>
-                    </button>
+                    <div className="frame-scanline" />
+                    <span className="frame-corner top-left" />
+                    <span className="frame-corner top-right" />
+                    <span className="frame-corner bottom-left" />
+                    <span className="frame-corner bottom-right" />
                   </div>
                 </div>
 
@@ -252,43 +197,43 @@ export default function StationOverlay({
           SCENE 3: EXPERIENCE (FIELD WORK)
       ======================================================== */}
           {currentStation.id === 'experience' && (
-            <div className="tva-panel station-card animate-fadeIn">
-              <div className="card-badge">WORK EXPERIENCE // PRACTICAL WORK</div>
-              <h2 className="section-title">Engineering & Industry Experience</h2>
+            <div className="tva-panel station-card wide-card animate-fadeIn">
+              <div className="card-badge text-amber-400">WORK EXPERIENCE // PRACTICAL WORK</div>
+              <h2 className="section-title">Professional Experience</h2>
+              <p className="section-description">
+                Hands-on Research & Development training and system architecture.
+              </p>
 
-              <div className="timeline-items">
-                <div className="experience-item">
-                  <div className="exp-dot" />
-                  <div className="exp-content">
-                    <span className="exp-role">Software Developer & Trainee</span>
-                    <span className="exp-company">Modern Web & Systems Engineering</span>
-                    <p className="exp-desc">
-                      Architected scalable frontends with React.js, structured clean database models, and integrated resilient RESTful APIs that keep user interactions glitch-free.
-                    </p>
-                  </div>
-                </div>
+              <div className="experience-container">
+                {EXPERIENCE_DATA.map((exp, idx) => (
+                  <div key={idx} className="experience-card">
+                    <div className="exp-card-header">
+                      <div className="exp-role-group">
+                        <span className="exp-role">{exp.role}</span>
+                        <span className="exp-company">@ {exp.company}</span>
+                      </div>
+                      <span className="exp-badge">{exp.badge}</span>
+                    </div>
 
-                <div className="experience-item">
-                  <div className="exp-dot" />
-                  <div className="exp-content">
-                    <span className="exp-role">Smart System Engineering</span>
-                    <span className="exp-company">Booking & Facility Management Workflows</span>
-                    <p className="exp-desc">
-                      Engineered automated dormitory and resource booking systems reducing manual triage time by 70% with real-time status syncing.
-                    </p>
-                  </div>
-                </div>
+                    <div className="exp-program-tag">
+                      {exp.program}
+                    </div>
 
-                <div className="experience-item">
-                  <div className="exp-dot" />
-                  <div className="exp-content">
-                    <span className="exp-role">Industrial Exposure & Study</span>
-                    <span className="exp-company">Cyberpark Calicut Techne Industry Visit</span>
-                    <p className="exp-desc">
-                      Conducted on-site evaluation of enterprise IT practices, cloud workflows, agile software pipelines, and software best practices.
-                    </p>
+                    <div className="exp-project-box">
+                      <span className="exp-project-label">CORE SYSTEM ARCHITECTURE:</span>
+                      <h4 className="exp-project-title">{exp.projectTitle}</h4>
+                    </div>
+
+                    <div className="exp-highlights-list">
+                      {exp.highlights.map((point, pIdx) => (
+                        <div key={pIdx} className="exp-highlight-item">
+                          <span className="exp-bullet-glow">▸</span>
+                          <p className="exp-highlight-text">{point}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
             </div>
           )}
@@ -596,142 +541,7 @@ export default function StationOverlay({
         </div>
       )}
 
-      {/* ========================================================
-          3D CHARACTER MODEL INSPECTOR MODAL
-      ======================================================== */}
-      {is3DModalOpen && (
-        <div
-          className="model-inspector-backdrop"
-          onClick={() => {
-            soundEngine.playTemPadClick();
-            setIs3DModalOpen(false);
-          }}
-        >
-          <div
-            className="model-inspector-window tva-panel animate-scaleUp"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="inspector-header">
-              <div className="inspector-title-group">
-                <span className="inspector-badge">
-                  3D CHARACTER ASSET // REAL-TIME 360° STUDIO
-                </span>
-                <h3 className="inspector-title">
-                  NAVAS MOOSA — 360° 3D AVATAR STUDIO
-                </h3>
-                <span className="inspector-subtitle">
-                  Interactive 3D Human Model • Preserving Real Face Identity & Bespoke Black Suit
-                </span>
-              </div>
 
-              {/* View Mode Tabs (3D Studio vs Reference Sheet) */}
-              <div className="modal-mode-tabs">
-                <button
-                  type="button"
-                  className={`modal-mode-btn ${inspectorMode === 'studio' ? 'active' : ''}`}
-                  onClick={() => {
-                    soundEngine.playTemPadClick();
-                    setInspectorMode('studio');
-                  }}
-                >
-                  <Sparkles size={13} />
-                  <span>3D Orbit Studio</span>
-                </button>
-                <button
-                  type="button"
-                  className={`modal-mode-btn ${inspectorMode === 'reference' ? 'active' : ''}`}
-                  onClick={() => {
-                    soundEngine.playTemPadClick();
-                    setInspectorMode('reference');
-                  }}
-                >
-                  <FileText size={13} />
-                  <span>Reference Sheet</span>
-                </button>
-              </div>
-
-              <button
-                type="button"
-                className="tva-btn inspector-close-btn"
-                onClick={() => {
-                  soundEngine.playTemPadClick();
-                  setIs3DModalOpen(false);
-                }}
-                title="Close 3D Inspector"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="inspector-body">
-              {inspectorMode === 'studio' ? (
-                /* Full Interactive 360 Studio */
-                <div className="inspector-studio-viewport">
-                  <AvatarViewer isCompact={false} initialView="front" />
-                </div>
-              ) : (
-                /* Multi-View Character Reference Sheet & Face Photo */
-                <div className="inspector-reference-display">
-                  <div className="reference-grid">
-                    <div className="ref-panel sheet-panel">
-                      <div className="ref-panel-header">
-                        <span className="ref-badge">4-VIEW CHARACTER SHEET</span>
-                        <h4>Front • Side / Three-Quarter • Back • Head Close-Up</h4>
-                      </div>
-                      <div className="ref-img-wrap">
-                        <img
-                          src="/assets/navas_moosa_character_sheet.png"
-                          alt="Navas Moosa 4-View Character Reference Sheet"
-                          className="ref-img"
-                        />
-                      </div>
-                    </div>
-                    <div className="ref-panel face-panel">
-                      <div className="ref-panel-header">
-                        <span className="ref-badge">ORIGINAL PORTRAIT</span>
-                        <h4>Real Face Identity & South Asian Skin Tone Reference</h4>
-                      </div>
-                      <div className="ref-img-wrap">
-                        <img
-                          src="/assets/navas_moosa_face.jpg"
-                          alt="Navas Moosa Real Face Portrait Reference"
-                          className="ref-face-img"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Technical Specifications Dossier */}
-              <div className="inspector-specs-grid">
-                <div className="spec-card">
-                  <span className="spec-label">CHARACTER IDENTITY</span>
-                  <span className="spec-val tva-gold-text">NAVAS MOOSA K P</span>
-                  <span className="spec-sub">Preserved Natural Face, Hairline & South Asian Skin Tone</span>
-                </div>
-                <div className="spec-card">
-                  <span className="spec-label">OUTFIT / WARDROBE</span>
-                  <span className="spec-val text-amber-300">Tailored Obsidian Black Suit</span>
-                  <span className="spec-sub">Black Shirt Unbuttoned at Collar, Creased Trousers, Oxford Shoes</span>
-                </div>
-                <div className="spec-card">
-                  <span className="spec-label">HAIR & ANATOMY</span>
-                  <span className="spec-val text-green-400">Natural Dark Wavy Hair</span>
-                  <span className="spec-sub">Thick Curly Volume, Chiseled Jawline, Defined Eyes</span>
-                </div>
-                <div className="spec-card">
-                  <span className="spec-label">3D ORBIT CONTROLS</span>
-                  <span className="spec-val text-cyan-400">Full 360° Drag & Zoom</span>
-                  <span className="spec-sub">Front, Back, Left, Right, 3/4 & Face Close-Up Camera Presets</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       <style>{`
         .station-overlay-container {
@@ -895,208 +705,43 @@ export default function StationOverlay({
         }
 
         .navas-3d-showcase {
-          width: 260px;
+          width: 220px;
           flex-shrink: 0;
           display: flex;
           flex-direction: column;
           gap: 8px;
         }
 
-        .navas-avatar-embedded-wrap {
+        .navas-avatar-frame {
           position: relative;
           width: 100%;
-          height: 310px;
+          height: 290px;
           border-radius: 10px;
           overflow: hidden;
-          box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-        }
-
-        .showcase-telemetry-bar {
+          border: 1px solid rgba(229, 179, 66, 0.45);
+          box-shadow: 0 0 20px rgba(229, 179, 66, 0.2), inset 0 0 25px rgba(0, 0, 0, 0.8);
+          background: radial-gradient(circle at 50% 32%, rgba(229, 179, 66, 0.12) 0%, rgba(24, 18, 14, 0.95) 75%);
           display: flex;
-          align-items: center;
-          justify-content: space-between;
-          font-family: var(--font-mono);
-          font-size: 8.5px;
-          color: #fbbf24;
-          padding: 0 2px;
+          align-items: flex-end;
+          justify-content: center;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .telemetry-live-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: #34d399;
-          box-shadow: 0 0 8px #34d399;
-          display: inline-block;
-          margin-right: 4px;
+        .navas-avatar-frame:hover {
+          box-shadow: 0 0 25px rgba(229, 179, 66, 0.35), inset 0 0 20px rgba(0, 0, 0, 0.7);
         }
 
-        .telemetry-title {
-          font-weight: 700;
-          letter-spacing: 0.8px;
-          flex: 1;
-        }
-
-        .telemetry-cycle-btn {
-          background: rgba(245, 158, 11, 0.15);
-          border: 1px solid rgba(245, 158, 11, 0.35);
-          color: #fef08a;
-          border-radius: 4px;
-          padding: 2px 5px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          transition: all 0.2s;
-        }
-
-        .telemetry-cycle-btn:hover {
-          background: rgba(245, 158, 11, 0.3);
-          border-color: #f59e0b;
-          transform: rotate(45deg);
-        }
-
-        .navas-img-frame.interactive-frame {
-          position: relative;
-          width: 100%;
-          height: 245px;
-          border-radius: 10px;
-          overflow: hidden;
-          border: 1px solid rgba(229, 179, 66, 0.55);
-          box-shadow: 0 0 20px rgba(229, 179, 66, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.6);
-          background: #0d0a08;
-          cursor: pointer;
-          transition: transform 0.15s ease-out, box-shadow 0.3s ease;
-          animation: zeroGFloat 5s ease-in-out infinite;
-        }
-
-        @keyframes zeroGFloat {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-4px);
-          }
-        }
-
-        .navas-img-frame.interactive-frame:hover {
-          box-shadow: 0 0 25px rgba(229, 179, 66, 0.4), inset 0 0 15px rgba(245, 158, 11, 0.15);
-        }
-
-        .navas-3d-photo {
+        .navas-avatar-face-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+          object-position: center top;
+          filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.75));
+          transition: transform 0.35s ease;
         }
 
-        .navas-3d-photo.view-float {
-          object-position: 21% center;
-          transform: scale(1.16);
-        }
-
-        .navas-3d-photo.view-bust {
-          object-position: 84% 42%;
-          transform: scale(1.18);
-        }
-
-        .navas-3d-photo.view-rear {
-          object-position: 53.5% center;
-          transform: scale(1.16);
-        }
-
-        .navas-3d-photo.view-sheet {
-          object-fit: contain;
-          object-position: center center;
-          background: #090b0e;
-          transform: scale(1.0);
-        }
-
-        .frame-reticle-cross {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.25) 85%);
-        }
-
-        .frame-orbit-rings-deco {
-          position: absolute;
-          width: 110px;
-          height: 110px;
-          border: 1px dashed rgba(56, 189, 248, 0.2);
-          border-radius: 50%;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          pointer-events: none;
-        }
-
-        .frame-hud-coords {
-          position: absolute;
-          bottom: 8px;
-          left: 8px;
-          font-family: var(--font-mono);
-          font-size: 8px;
-          font-weight: 600;
-          color: #38bdf8;
-          background: rgba(8, 12, 16, 0.85);
-          padding: 2px 6px;
-          border-radius: 4px;
-          border: 1px solid rgba(56, 189, 248, 0.35);
-          pointer-events: none;
-          backdrop-filter: blur(4px);
-        }
-
-        .frame-inspect-badge {
-          position: absolute;
-          top: 8px;
-          right: 8px;
-          font-family: var(--font-mono);
-          font-size: 8px;
-          font-weight: 700;
-          color: #fbbf24;
-          background: rgba(18, 12, 8, 0.85);
-          padding: 2px 6px;
-          border-radius: 4px;
-          border: 1px solid rgba(245, 158, 11, 0.4);
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          pointer-events: none;
-          backdrop-filter: blur(4px);
-        }
-
-        .model-view-tabs {
-          display: flex;
-          gap: 3px;
-          margin-top: 2px;
-        }
-
-        .view-tab-btn {
-          flex: 1;
-          padding: 5px 2px;
-          font-size: 8.5px;
-          font-family: var(--font-mono);
-          font-weight: 600;
-          color: #fed7aa;
-          background: rgba(30, 22, 16, 0.7);
-          border: 1px solid rgba(245, 158, 11, 0.2);
-          border-radius: 4px;
-          cursor: pointer;
-          transition: all 0.2s;
-          text-align: center;
-        }
-
-        .view-tab-btn:hover {
-          background: rgba(245, 158, 11, 0.15);
-          border-color: rgba(245, 158, 11, 0.45);
-          color: #fff;
-        }
-
-        .view-tab-btn.active {
-          background: rgba(245, 158, 11, 0.25);
-          border-color: #f59e0b;
-          color: #fef08a;
-          box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+        .navas-avatar-frame:hover .navas-avatar-face-img {
+          transform: scale(1.04);
         }
 
         .frame-scanline {
@@ -1104,8 +749,8 @@ export default function StationOverlay({
           inset: 0;
           background: repeating-linear-gradient(
             0deg,
-            rgba(0, 0, 0, 0.15),
-            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.12),
+            rgba(0, 0, 0, 0.12) 2px,
             transparent 2px,
             transparent 4px
           );
@@ -1124,320 +769,6 @@ export default function StationOverlay({
         .frame-corner.top-right { top: 2px; right: 2px; border-width: 2px 2px 0 0; }
         .frame-corner.bottom-left { bottom: 2px; left: 2px; border-width: 0 0 2px 2px; }
         .frame-corner.bottom-right { bottom: 2px; right: 2px; border-width: 0 2px 2px 0; }
-
-        .navas-photo-caption {
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-          background: rgba(30, 22, 16, 0.85);
-          padding: 8px 10px;
-          border-radius: 6px;
-          border: 1px solid rgba(245, 158, 11, 0.25);
-        }
-
-        .caption-tag-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 4px;
-        }
-
-        .caption-tag {
-          font-family: var(--font-mono);
-          font-size: 8px;
-          color: #fb923c;
-          letter-spacing: 0.8px;
-        }
-
-        .caption-subtag {
-          font-family: var(--font-mono);
-          font-size: 7.5px;
-          color: #34d399;
-          font-weight: 600;
-          background: rgba(52, 211, 153, 0.1);
-          padding: 1px 4px;
-          border-radius: 3px;
-          border: 1px solid rgba(52, 211, 153, 0.25);
-        }
-
-        .caption-title {
-          font-family: var(--font-mono);
-          font-size: 10px;
-          font-weight: 700;
-          color: #fed7aa;
-        }
-
-        .caption-meta {
-          font-family: var(--font-mono);
-          font-size: 8px;
-          color: #94a3b8;
-          letter-spacing: 0.5px;
-        }
-
-        .caption-inspect-btn {
-          margin-top: 5px;
-          width: 100%;
-          padding: 4px 6px;
-          font-family: var(--font-mono);
-          font-size: 9px;
-          font-weight: 600;
-          color: #fbbf24;
-          background: rgba(245, 158, 11, 0.12);
-          border: 1px solid rgba(245, 158, 11, 0.35);
-          border-radius: 4px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 5px;
-          transition: all 0.2s;
-        }
-
-        .caption-inspect-btn:hover {
-          background: rgba(245, 158, 11, 0.25);
-          border-color: #f59e0b;
-          color: #fff;
-          box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
-        }
-
-        /* 3D Character Model Inspector Modal Styles */
-        .model-inspector-backdrop {
-          position: fixed;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.88);
-          backdrop-filter: blur(10px);
-          z-index: 100;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
-        }
-
-        .model-inspector-window {
-          max-width: 880px;
-          width: 100%;
-          max-height: 92vh;
-          overflow-y: auto;
-          background: #120e0b;
-          border: 1px solid rgba(245, 158, 11, 0.45);
-          border-radius: 14px;
-          box-shadow: 0 0 50px rgba(0, 0, 0, 0.95), 0 0 30px rgba(245, 158, 11, 0.25);
-          padding: 22px;
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-          position: relative;
-        }
-
-        .inspector-header {
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 16px;
-          border-bottom: 1px solid rgba(245, 158, 11, 0.2);
-          padding-bottom: 14px;
-        }
-
-        .inspector-badge {
-          font-family: var(--font-mono);
-          font-size: 9px;
-          color: #fbbf24;
-          letter-spacing: 1.2px;
-          font-weight: 700;
-          display: block;
-          margin-bottom: 4px;
-        }
-
-        .inspector-title {
-          font-family: var(--font-display);
-          font-size: 20px;
-          font-weight: 700;
-          color: #fed7aa;
-          margin: 0;
-          letter-spacing: 1px;
-        }
-
-        .inspector-subtitle {
-          font-family: var(--font-mono);
-          font-size: 11px;
-          color: #94a3b8;
-          margin-top: 4px;
-          display: block;
-        }
-
-        .inspector-close-btn {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(245, 158, 11, 0.3);
-          color: #fed7aa;
-          border-radius: 6px;
-          padding: 6px;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-
-        .inspector-close-btn:hover {
-          background: rgba(245, 158, 11, 0.2);
-          border-color: #f59e0b;
-          color: #fff;
-        }
-
-        .inspector-body {
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-        }
-
-        .modal-mode-tabs {
-          display: flex;
-          gap: 6px;
-        }
-
-        .modal-mode-btn {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 6px 12px;
-          font-family: var(--font-mono);
-          font-size: 11px;
-          font-weight: 600;
-          color: #d6c7b2;
-          background: rgba(36, 28, 22, 0.8);
-          border: 1px solid rgba(229, 179, 66, 0.25);
-          border-radius: 6px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .modal-mode-btn:hover {
-          color: #fff;
-          border-color: rgba(229, 179, 66, 0.5);
-          background: rgba(48, 38, 30, 0.95);
-        }
-
-        .modal-mode-btn.active {
-          background: rgba(229, 179, 66, 0.25);
-          border-color: #f59e0b;
-          color: #fbbf24;
-          box-shadow: 0 0 12px rgba(229, 179, 66, 0.3);
-        }
-
-        .inspector-studio-viewport {
-          width: 100%;
-          height: 480px;
-          border-radius: 10px;
-          overflow: hidden;
-          background: #080706;
-          border: 1px solid rgba(229, 179, 66, 0.3);
-          box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
-        }
-
-        .inspector-reference-display {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .reference-grid {
-          display: grid;
-          grid-template-columns: 2fr 1fr;
-          gap: 14px;
-        }
-
-        @media (max-width: 768px) {
-          .reference-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        .ref-panel {
-          background: rgba(20, 16, 12, 0.9);
-          border: 1px solid rgba(229, 179, 66, 0.25);
-          border-radius: 10px;
-          padding: 12px;
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-
-        .ref-panel-header {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-
-        .ref-badge {
-          font-family: var(--font-mono);
-          font-size: 8.5px;
-          font-weight: 700;
-          color: #f59e0b;
-          letter-spacing: 0.08em;
-        }
-
-        .ref-panel-header h4 {
-          font-size: 11px;
-          color: #d6c7b2;
-          margin: 0;
-          font-weight: 500;
-        }
-
-        .ref-img-wrap {
-          border-radius: 6px;
-          overflow: hidden;
-          background: #0d0a08;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 380px;
-        }
-
-        .ref-img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-
-        .ref-face-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center 20%;
-        }
-
-        .inspector-specs-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-          gap: 10px;
-        }
-
-        .spec-card {
-          background: rgba(24, 18, 14, 0.85);
-          border: 1px solid rgba(245, 158, 11, 0.2);
-          border-radius: 8px;
-          padding: 10px 12px;
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-        }
-
-        .spec-label {
-          font-family: var(--font-mono);
-          font-size: 8.5px;
-          color: #fb923c;
-          letter-spacing: 0.8px;
-        }
-
-        .spec-val {
-          font-family: var(--font-mono);
-          font-size: 11px;
-          font-weight: 700;
-        }
-
-        .spec-sub {
-          font-size: 10px;
-          color: #94a3b8;
-          line-height: 1.35;
-        }
 
         .aboutme-details {
           flex: 1;
@@ -1460,6 +791,139 @@ export default function StationOverlay({
           padding: 3px 8px;
           border-radius: 4px;
           border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        /* Experience Card Styles */
+        .experience-container {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-top: 10px;
+        }
+
+        .experience-card {
+          background: rgba(30, 24, 18, 0.88);
+          border: 1px solid rgba(229, 179, 66, 0.35);
+          border-radius: 10px;
+          padding: 16px 18px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 0 16px rgba(229, 179, 66, 0.05);
+          transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .experience-card:hover {
+          border-color: rgba(245, 158, 11, 0.65);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6), 0 0 18px rgba(245, 158, 11, 0.2);
+        }
+
+        .exp-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+
+        .exp-role-group {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .exp-role {
+          font-family: var(--font-display);
+          font-size: 15px;
+          font-weight: 700;
+          color: #fef08a;
+          letter-spacing: 0.5px;
+        }
+
+        .exp-company {
+          font-family: var(--font-mono);
+          font-size: 13px;
+          font-weight: 700;
+          color: #fb923c;
+          letter-spacing: 0.5px;
+        }
+
+        .exp-badge {
+          font-family: var(--font-mono);
+          font-size: 9px;
+          font-weight: 700;
+          background: rgba(245, 158, 11, 0.2);
+          color: #fbbf24;
+          padding: 3px 8px;
+          border-radius: 4px;
+          border: 1px solid rgba(245, 158, 11, 0.4);
+          letter-spacing: 0.5px;
+        }
+
+        .exp-program-tag {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          color: #38bdf8;
+          background: rgba(56, 189, 248, 0.1);
+          padding: 4px 10px;
+          border-radius: 4px;
+          border: 1px solid rgba(56, 189, 248, 0.25);
+          display: inline-block;
+          width: fit-content;
+        }
+
+        .exp-project-box {
+          background: rgba(18, 14, 10, 0.75);
+          border-left: 3px solid #f59e0b;
+          padding: 8px 12px;
+          border-radius: 0 6px 6px 0;
+          margin: 2px 0;
+        }
+
+        .exp-project-label {
+          font-family: var(--font-mono);
+          font-size: 8.5px;
+          color: #a89a8a;
+          letter-spacing: 1px;
+          display: block;
+          margin-bottom: 2px;
+        }
+
+        .exp-project-title {
+          font-family: var(--font-sans);
+          font-size: 13px;
+          font-weight: 600;
+          color: #fff;
+          margin: 0;
+        }
+
+        .exp-highlights-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-top: 2px;
+        }
+
+        .exp-highlight-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+        }
+
+        .exp-bullet-glow {
+          color: #f59e0b;
+          font-size: 13px;
+          line-height: 1.4;
+          text-shadow: 0 0 6px rgba(245, 158, 11, 0.8);
+          flex-shrink: 0;
+        }
+
+        .exp-highlight-text {
+          font-size: 11.5px;
+          color: #d6c7b2;
+          line-height: 1.5;
+          margin: 0;
         }
 
         /* Projects Grid */
@@ -1788,8 +1252,8 @@ export default function StationOverlay({
             align-items: center;
           }
 
-          .navas-img-frame.interactive-frame {
-            height: 220px;
+          .navas-avatar-frame {
+            height: 240px;
             width: 100%;
           }
 

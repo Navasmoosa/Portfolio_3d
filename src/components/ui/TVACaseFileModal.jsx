@@ -13,6 +13,7 @@ import {
 import {
   PERSONAL_INFO,
   EDUCATION_DATA,
+  EXPERIENCE_DATA,
   SKILLS_DATA,
   APPS_DATA,
 } from '../../data/portfolioData';
@@ -176,12 +177,30 @@ export default function TVACaseFileModal({ onClose }) {
             </div>
           </section>
 
-          {/* Additional Experience & Links */}
+          {/* Work Experience */}
           <section className="dossier-section">
-            <h3 className="section-heading">V. WORK EXPERIENCE & INDUSTRIAL EXPOSURE</h3>
-            <p className="summary-paragraph">
-              <strong>Industrial Visit:</strong> Cyberpark Calicut Techne Industry — Hands-on exposure to enterprise software pipelines, devops, and industry-grade engineering environments.
-            </p>
+            <h3 className="section-heading">V. WORK EXPERIENCE</h3>
+            <div className="experience-dossier-list">
+              {EXPERIENCE_DATA.map((exp, idx) => (
+                <div key={idx} className="exp-dossier-entry">
+                  <div className="exp-dossier-head">
+                    <span className="entry-title">{exp.role} – {exp.company}</span>
+                    <span className="tech-badge">{exp.badge}</span>
+                  </div>
+                  <div className="exp-dossier-sub">
+                    <span className="exp-program-name">{exp.program}</span>
+                  </div>
+                  <div className="exp-project-name">
+                    <strong>Project:</strong> {exp.projectTitle}
+                  </div>
+                  <ul className="exp-bullet-points">
+                    {exp.highlights.map((pt, pIdx) => (
+                      <li key={pIdx}>{pt}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </section>
 
           {/* Official Sign-off Stamp */}
@@ -479,6 +498,52 @@ export default function TVACaseFileModal({ onClose }) {
           font-size: 12px;
           color: #44403c;
           line-height: 1.5;
+        }
+
+        .experience-dossier-list {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .exp-dossier-entry {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .exp-dossier-head {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .exp-dossier-sub {
+          font-family: 'Share Tech Mono', monospace;
+          font-size: 11px;
+          color: #854d0e;
+          font-weight: 600;
+        }
+
+        .exp-project-name {
+          font-size: 12px;
+          color: #1c1917;
+          margin-top: 2px;
+        }
+
+        .exp-bullet-points {
+          margin-top: 4px;
+          padding-left: 18px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          font-size: 12px;
+          color: #44403c;
+          line-height: 1.5;
+        }
+
+        .exp-bullet-points li {
+          list-style-type: disc;
         }
 
         .dossier-footer {

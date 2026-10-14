@@ -530,29 +530,29 @@ const TVAWorld = React.forwardRef(function TVAWorld(
     expCtx.strokeRect(6, 6, 500, 328);
 
     expCtx.fillStyle = '#ffd868';
-    expCtx.font = 'bold 26px "Cinzel", serif';
-    expCtx.fillText('WORK EXPERIENCE // PRACTICAL WORK', 28, 50);
+    expCtx.font = 'bold 24px "Cinzel", serif';
+    expCtx.fillText('WORK EXPERIENCE // COGNILERN', 28, 48);
 
     expCtx.fillStyle = '#38bdf8';
-    expCtx.font = 'bold 20px sans-serif';
-    expCtx.fillText('• Software Developer & Trainee', 28, 95);
+    expCtx.font = 'bold 19px sans-serif';
+    expCtx.fillText('• R&D & GD Trainee – Cognilern', 28, 95);
     expCtx.fillStyle = '#cbd5e1';
-    expCtx.font = '16px monospace';
-    expCtx.fillText('  React.js, Full-Stack Architecture, REST APIs', 28, 125);
+    expCtx.font = '15px monospace';
+    expCtx.fillText('  Research & Development / GD Program', 28, 122);
 
     expCtx.fillStyle = '#34d399';
-    expCtx.font = 'bold 20px sans-serif';
-    expCtx.fillText('• Smart System Engineering', 28, 175);
+    expCtx.font = 'bold 19px sans-serif';
+    expCtx.fillText('• Smart Parking Management System', 28, 172);
     expCtx.fillStyle = '#cbd5e1';
-    expCtx.font = '16px monospace';
-    expCtx.fillText('  Automated Booking & Facility Workflow Systems', 28, 205);
+    expCtx.font = '15px monospace';
+    expCtx.fillText('  Real-Time Slots, RFID/QR Entry, Auto Fees', 28, 199);
 
     expCtx.fillStyle = '#f59e0b';
-    expCtx.font = 'bold 20px sans-serif';
-    expCtx.fillText('• Industrial Exposure', 28, 255);
+    expCtx.font = 'bold 19px sans-serif';
+    expCtx.fillText('• Security & Space Optimization', 28, 248);
     expCtx.fillStyle = '#cbd5e1';
-    expCtx.font = '16px monospace';
-    expCtx.fillText('  Cyberpark Calicut Techne Industry Visit', 28, 285);
+    expCtx.font = '15px monospace';
+    expCtx.fillText('  Tackled Queues, Unauthorized Access & CCTV', 28, 275);
 
     const expTexture = new THREE.CanvasTexture(expCanvas);
     const expScreen = new THREE.Mesh(
