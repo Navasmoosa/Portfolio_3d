@@ -30,20 +30,26 @@
 html, body, #root {
   width: 100%;
   height: 100%;
+  height: 100dvh;
   overflow: hidden;
   background-color: var(--tva-stone-dark);
   color: #f5f0e6;
   font-family: var(--font-sans);
   user-select: none;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Master Layout */
 .app-container {
   position: relative;
   width: 100vw;
+  width: 100dvw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: radial-gradient(circle at 50% 30%, #201a14 0%, #0d0a08 100%);
+  overscroll-behavior: none;
 }
 
 /* WebGL Canvas Viewport */
@@ -53,12 +59,14 @@ html, body, #root {
   width: 100%;
   height: 100%;
   z-index: 1;
+  touch-action: none;
 }
 
 canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
+  touch-action: none;
 }
 
 /* Retro TVA CRT Scanlines effect */
@@ -281,7 +289,7 @@ canvas {
 @media (max-width: 768px) {
   .tva-header-bar {
     padding: 0 12px;
-    height: 52px;
+    height: 50px;
   }
   .tva-main-title {
     font-size: 13px;
@@ -293,5 +301,38 @@ canvas {
   .tva-btn {
     padding: 6px 10px;
     font-size: 10px;
+  }
+  .btn-label-desktop {
+    display: none;
+  }
+}
+
+/* Mobile Landscape (short vertical viewport: 320px - 520px) */
+@media (orientation: landscape) and (max-height: 520px) {
+  .tva-header-bar {
+    height: 42px;
+    padding: 0 10px;
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+  .tva-logo-badge {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+  .tva-main-title {
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+  .tva-sub-title {
+    display: none;
+  }
+  .tva-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+    gap: 4px;
+  }
+  .btn-label-desktop {
+    display: none;
   }
 }

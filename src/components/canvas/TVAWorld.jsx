@@ -23,6 +23,7 @@ const TVAWorld = React.forwardRef(function TVAWorld(
     onAppSelect,
     isTalking,
     onPlayerTelemetry,
+    isFreeMode = false,
   },
   ref
 ) {
@@ -33,7 +34,11 @@ const TVAWorld = React.forwardRef(function TVAWorld(
   const onAppSelectRef = useRef(onAppSelect);
   const isTalkingRef = useRef(isTalking);
   const activeStationIndexRef = useRef(currentStationIndex);
+  const isFreeModeRef = useRef(isFreeMode);
   const teleportRef = useRef(null);
+  const resetCameraRef = useRef(null);
+  const orbitCameraRef = useRef(null);
+  const zoomCameraRef = useRef(null);
 
   // Keep callback refs updated without re-running Three.js setup
   useEffect(() => {
@@ -51,6 +56,10 @@ const TVAWorld = React.forwardRef(function TVAWorld(
   useEffect(() => {
     isTalkingRef.current = isTalking;
   }, [isTalking]);
+
+  useEffect(() => {
+    isFreeModeRef.current = isFreeMode;
+  }, [isFreeMode]);
 
   // When external station changes (e.g. from AutoTour or HUD dot click), walk character to that station
   useEffect(() => {
@@ -86,6 +95,21 @@ const TVAWorld = React.forwardRef(function TVAWorld(
             characterRef.current.setTargetPosition(0, cp.z);
           }
         }
+      }
+    },
+    resetCamera: () => {
+      if (resetCameraRef.current) {
+        resetCameraRef.current();
+      }
+    },
+    orbitCamera: (deltaTheta, deltaPhi) => {
+      if (orbitCameraRef.current) {
+        orbitCameraRef.current(deltaTheta, deltaPhi);
+      }
+    },
+    zoomCamera: (deltaZoom) => {
+      if (zoomCameraRef.current) {
+        zoomCameraRef.current(deltaZoom);
       }
     },
     getCharacter: () => characterRef.current,
@@ -891,47 +915,154 @@ const TVAWorld = React.forwardRef(function TVAWorld(
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 
-    // Raycasting for interactive clicks on 3D props
+    // ========================================================
+    // Free Orbit / Touch Drag State & Camera Control
+    // ========================================================
+    const orbit = {
+      isDragging: false,
+      startX: 0,
+      startY: 0,
+      hasMoved: false,
+      theta: 0, // Yaw angle (horizontal rotation around player)
+      phi: 0.18, // Pitch angle (vertical elevation)
+      radius: 4.8, // Current distance from player
+      targetRadius: 4.8, // Target distance for smooth zoom
+      minRadius: 2.0,
+      maxRadius: 10.0,
+      minPhi: -0.15,
+      maxPhi: 1.15,
+      touchStartDist: 0,
+      touchStartRadius: 4.8,
+    };
+
+    resetCameraRef.current = () => {
+      orbit.theta = 0;
+      orbit.phi = 0.18;
+      orbit.targetRadius = 4.8;
+      orbit.radius = 4.8;
+    };
+
+    orbitCameraRef.current = (deltaTheta, deltaPhi) => {
+      orbit.theta += deltaTheta;
+      orbit.phi = Math.max(orbit.minPhi, Math.min(orbit.maxPhi, orbit.phi + deltaPhi));
+    };
+
+    zoomCameraRef.current = (deltaZoom) => {
+      orbit.targetRadius = Math.max(
+        orbit.minRadius,
+        Math.min(orbit.maxRadius, orbit.targetRadius + deltaZoom)
+      );
+    };
+
+    // Raycasting & Pointer/Touch Handlers
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
     const handlePointerDown = (e) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      orbit.isDragging = true;
+      orbit.startX = e.clientX;
+      orbit.startY = e.clientY;
+      orbit.hasMoved = false;
+    };
 
-      raycaster.setFromCamera(mouse, camera);
-
-      // Check click on Disaster SOS Beacon phone
-      const campusHits = raycaster.intersectObjects(campusPhone.children, true);
-      if (campusHits.length > 0) {
-        if (onAppSelectRef.current) onAppSelectRef.current('disaster');
-        return;
+    const handlePointerMove = (e) => {
+      if (!orbit.isDragging) return;
+      const dx = e.clientX - orbit.startX;
+      const dy = e.clientY - orbit.startY;
+      if (Math.hypot(dx, dy) > 4) {
+        orbit.hasMoved = true;
       }
 
-      // Check click on Relief Fleet phone
-      const pocketHits = raycaster.intersectObjects(pocketPhone.children, true);
-      if (pocketHits.length > 0) {
-        if (onAppSelectRef.current) onAppSelectRef.current('disaster');
-        return;
-      }
+      // Rotate camera in Free Mode or when dragging on canvas
+      const sensitivity = 0.0055;
+      orbit.theta -= dx * sensitivity;
+      orbit.phi = Math.max(orbit.minPhi, Math.min(orbit.maxPhi, orbit.phi + dy * sensitivity));
 
-      // Check click on Archive Table / Disaster
-      const archiveHits = raycaster.intersectObjects(archiveTableGroup.children, true);
-      if (archiveHits.length > 0) {
-        if (onAppSelectRef.current) onAppSelectRef.current('disaster');
-        return;
-      }
+      orbit.startX = e.clientX;
+      orbit.startY = e.clientY;
+    };
 
-      // Check click on Navas Moosa 3D Showcase
-      const navasHits = raycaster.intersectObjects(navasShowcaseGroup.children, true);
-      if (navasHits.length > 0) {
-        if (onStationChangeRef.current) onStationChangeRef.current(1);
-        return;
+    const handlePointerUp = (e) => {
+      const wasDragging = orbit.isDragging;
+      orbit.isDragging = false;
+
+      // If user tapped/clicked without dragging, execute interactive raycast
+      if (wasDragging && !orbit.hasMoved) {
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+
+        // Check click on Disaster SOS Beacon phone
+        const campusHits = raycaster.intersectObjects(campusPhone.children, true);
+        if (campusHits.length > 0) {
+          if (onAppSelectRef.current) onAppSelectRef.current('disaster');
+          return;
+        }
+
+        // Check click on Relief Fleet phone
+        const pocketHits = raycaster.intersectObjects(pocketPhone.children, true);
+        if (pocketHits.length > 0) {
+          if (onAppSelectRef.current) onAppSelectRef.current('disaster');
+          return;
+        }
+
+        // Check click on Archive Table / Disaster
+        const archiveHits = raycaster.intersectObjects(archiveTableGroup.children, true);
+        if (archiveHits.length > 0) {
+          if (onAppSelectRef.current) onAppSelectRef.current('disaster');
+          return;
+        }
+
+        // Check click on Navas Moosa 3D Showcase
+        const navasHits = raycaster.intersectObjects(navasShowcaseGroup.children, true);
+        if (navasHits.length > 0) {
+          if (onStationChangeRef.current) onStationChangeRef.current(1);
+          return;
+        }
+      }
+    };
+
+    // Mobile Pinch-to-Zoom touch handling
+    const handleTouchStart = (e) => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        orbit.touchStartDist = Math.hypot(dx, dy);
+        orbit.touchStartRadius = orbit.targetRadius;
+      }
+    };
+
+    const handleTouchMove = (e) => {
+      if (e.touches.length === 2 && orbit.touchStartDist > 0) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const currentDist = Math.hypot(dx, dy);
+        const factor = orbit.touchStartDist / currentDist;
+        orbit.targetRadius = Math.max(
+          orbit.minRadius,
+          Math.min(orbit.maxRadius, orbit.touchStartRadius * factor)
+        );
+      }
+    };
+
+    const handleWheel = (e) => {
+      if (isFreeModeRef.current || e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        orbit.targetRadius = Math.max(
+          orbit.minRadius,
+          Math.min(orbit.maxRadius, orbit.targetRadius + e.deltaY * 0.005)
+        );
       }
     };
 
     renderer.domElement.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    renderer.domElement.addEventListener('touchstart', handleTouchStart, { passive: true });
+    renderer.domElement.addEventListener('touchmove', handleTouchMove, { passive: true });
+    renderer.domElement.addEventListener('wheel', handleWheel, { passive: false });
 
     // ========================================================
     // 7. ANIMATION & OPEN WORLD CAMERA FOLLOW LOOP
@@ -950,6 +1081,12 @@ const TVAWorld = React.forwardRef(function TVAWorld(
       if (navasCharacter) {
         navasCharacter.teleport(0, cp.z);
       }
+
+      // Reset orbit to face down corridor
+      orbit.theta = 0;
+      orbit.phi = 0.18;
+      orbit.targetRadius = 4.8;
+      orbit.radius = 4.8;
 
       // Snap camera directly behind player at target station
       const camTargetX = 0;
@@ -1036,23 +1173,43 @@ const TVAWorld = React.forwardRef(function TVAWorld(
         });
       }
 
-      // THIRD-PERSON DYNAMIC FOLLOW CAMERA
-      // Positioned behind the player, gliding smoothly
-      const camTargetX = charX * 0.45;
-      const camTargetY = 2.05;
-      const camTargetZ = charZ + 4.8;
+      // CAMERA LOCOMOTION (FREE 360° ORBIT vs GUIDED THIRD-PERSON FOLLOW)
+      if (isFreeModeRef.current) {
+        // Orbit smoothly around character in full 360°
+        orbit.radius = THREE.MathUtils.lerp(orbit.radius, orbit.targetRadius, delta * 6.0);
+        const cosPhi = Math.cos(orbit.phi);
+        const camOffsetX = orbit.radius * Math.sin(orbit.theta) * cosPhi;
+        const camOffsetY = orbit.radius * Math.sin(orbit.phi) + 1.6;
+        const camOffsetZ = orbit.radius * Math.cos(orbit.theta) * cosPhi;
 
-      currentCamera.x = THREE.MathUtils.lerp(currentCamera.x, camTargetX, delta * 3.8);
-      currentCamera.y = THREE.MathUtils.lerp(currentCamera.y, camTargetY, delta * 3.8);
-      currentCamera.z = THREE.MathUtils.lerp(currentCamera.z, camTargetZ, delta * 3.8);
+        const targetCamX = charX + camOffsetX;
+        const targetCamY = Math.max(0.4, camOffsetY);
+        const targetCamZ = charZ + camOffsetZ;
 
-      camera.position.set(currentCamera.x, currentCamera.y, currentCamera.z);
-      camera.lookAt(charX * 0.7, 1.45, charZ - 2.8);
+        currentCamera.x = THREE.MathUtils.lerp(currentCamera.x, targetCamX, delta * 5.5);
+        currentCamera.y = THREE.MathUtils.lerp(currentCamera.y, targetCamY, delta * 5.5);
+        currentCamera.z = THREE.MathUtils.lerp(currentCamera.z, targetCamZ, delta * 5.5);
+
+        camera.position.set(currentCamera.x, currentCamera.y, currentCamera.z);
+        camera.lookAt(charX, 1.45, charZ);
+      } else {
+        // Standard third-person follow camera
+        const camTargetX = charX * 0.45;
+        const camTargetY = 2.05;
+        const camTargetZ = charZ + 4.8;
+
+        currentCamera.x = THREE.MathUtils.lerp(currentCamera.x, camTargetX, delta * 3.8);
+        currentCamera.y = THREE.MathUtils.lerp(currentCamera.y, camTargetY, delta * 3.8);
+        currentCamera.z = THREE.MathUtils.lerp(currentCamera.z, camTargetZ, delta * 3.8);
+
+        camera.position.set(currentCamera.x, currentCamera.y, currentCamera.z);
+        camera.lookAt(charX * 0.7, 1.45, charZ - 2.8);
+      }
 
       // MISS MINUTES COMPANION LOGIC
       // Floats beside player in transit, or takes stage at active station
-      if (nearestDist > 4.0) {
-        // In transit: companion hover beside player
+      if (nearestDist > 4.0 || isFreeModeRef.current) {
+        // In transit or free mode: companion hover beside player
         const mmTargetX = charX + 1.25;
         const mmTargetY = 1.9 + Math.sin(time * 3) * 0.08;
         const mmTargetZ = charZ - 0.5;
@@ -1114,23 +1271,49 @@ const TVAWorld = React.forwardRef(function TVAWorld(
 
     animate();
 
-    // 8. Resize Handler
+    // 8. Responsive Resize Handler (Handles Mobile Portrait, Landscape, and Desktop)
     const handleResize = () => {
       if (!container) return;
-      camera.aspect = container.clientWidth / container.clientHeight;
+      const width = container.clientWidth || window.innerWidth;
+      const height = container.clientHeight || window.innerHeight;
+      const aspect = width / height;
+      camera.aspect = aspect;
+
+      // Responsive FOV adjustments for portrait vs landscape
+      if (aspect < 0.75) {
+        camera.fov = 68; // Mobile portrait (wider vertical FOV so corridor isn't cut off)
+      } else if (aspect < 1.0) {
+        camera.fov = 60; // Tablet portrait
+      } else if (height < 500) {
+        camera.fov = 50; // Mobile landscape (short height)
+      } else {
+        camera.fov = 55; // Standard desktop/landscape
+      }
       camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setSize(width, height);
     };
 
     window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    // Initial call to set optimal FOV
+    handleResize();
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
       renderer.domElement.removeEventListener('pointerdown', handlePointerDown);
+      renderer.domElement.removeEventListener('touchstart', handleTouchStart);
+      renderer.domElement.removeEventListener('touchmove', handleTouchMove);
+      renderer.domElement.removeEventListener('wheel', handleWheel);
       cancelAnimationFrame(animationFrameId);
       teleportRef.current = null;
+      resetCameraRef.current = null;
+      orbitCameraRef.current = null;
+      zoomCameraRef.current = null;
       if (renderer.domElement && renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);
       }

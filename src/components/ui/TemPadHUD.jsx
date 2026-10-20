@@ -9,6 +9,8 @@ import {
   FileText,
   Compass,
   Sparkles,
+  Eye,
+  BookOpen,
 } from 'lucide-react';
 import { STATIONS } from '../../data/portfolioData';
 import { soundEngine } from '../../utils/SoundEffects';
@@ -21,6 +23,8 @@ export default function TemPadHUD({
   isMuted,
   onToggleMute,
   onOpenCaseFile,
+  isFreeMode = false,
+  onToggleFreeMode,
 }) {
   const currentStation = STATIONS[currentStationIndex] || STATIONS[0];
 
@@ -97,8 +101,25 @@ export default function TemPadHUD({
           </button>
         </div>
 
-        {/* Center: Auto Tour Controller */}
+        {/* Center: Auto Tour & Free Mode Controller */}
         <div className="tempad-center-group">
+          {/* Mode Switcher: Story vs Free View */}
+          <button
+            onClick={() => {
+              soundEngine.playTemPadClick();
+              if (onToggleFreeMode) onToggleFreeMode(!isFreeMode);
+            }}
+            className={`tva-btn mode-switch-btn ${isFreeMode ? 'free-mode-active' : ''}`}
+            title={isFreeMode ? 'Switch to Guided Story Mode' : 'Switch to 360° Free Roam Mode'}
+          >
+            {isFreeMode ? (
+              <Eye size={15} className="text-cyan-400" />
+            ) : (
+              <BookOpen size={15} className="text-amber-400" />
+            )}
+            <span className="mode-btn-text">{isFreeMode ? 'FREE MODE' : 'STORY MODE'}</span>
+          </button>
+
           <button
             onClick={() => {
               soundEngine.playTemPadClick();
@@ -107,7 +128,7 @@ export default function TemPadHUD({
             className={`tva-btn tour-toggle-btn ${isAutoTour ? 'active-tour' : ''}`}
           >
             {isAutoTour ? <Pause size={16} /> : <Play size={16} />}
-            <span>{isAutoTour ? 'PAUSE AUTO-TOUR' : 'PLAY GUIDED TOUR'}</span>
+            <span>{isAutoTour ? 'PAUSE' : 'AUTO-TOUR'}</span>
             {isAutoTour && <span className="pulsing-recording-dot" />}
           </button>
         </div>
@@ -293,10 +314,77 @@ export default function TemPadHUD({
           box-shadow: 0 0 6px rgba(220, 38, 38, 0.8);
         }
 
+        .mode-switch-btn {
+          border-color: rgba(229, 179, 66, 0.45);
+          font-weight: 600;
+          letter-spacing: 0.5px;
+          color: #fef08a;
+          background: rgba(35, 28, 20, 0.85);
+        }
+
+        .mode-switch-btn.free-mode-active {
+          background: linear-gradient(135deg, rgba(8, 145, 178, 0.4) 0%, rgba(2, 132, 199, 0.3) 100%);
+          border-color: #38bdf8;
+          color: #e0f2fe;
+          box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Mobile Portrait Media Mode */
         @media (max-width: 768px) {
           .tempad-hud-container {
-            bottom: 10px;
+            bottom: 8px;
             width: calc(100% - 16px);
+            gap: 6px;
+          }
+          .tempad-top-strip {
+            padding: 4px 10px;
+          }
+          .tempad-sector-badge {
+            font-size: 10px;
+          }
+          .station-dots-track {
+            display: none;
+          }
+          .tempad-main-bar {
+            padding: 6px 10px;
+          }
+          .btn-label-desktop {
+            display: none;
+          }
+          .casefile-text {
+            display: none;
+          }
+          .mode-btn-text {
+            font-size: 10px;
+          }
+          .tour-toggle-btn span {
+            font-size: 9.5px;
+          }
+          .tempad-step-btn {
+            padding: 6px 10px;
+          }
+        }
+
+        /* Mobile Landscape Media Mode */
+        @media (orientation: landscape) and (max-height: 520px) {
+          .tempad-hud-container {
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 150px);
+            max-width: 520px;
+            gap: 3px;
+          }
+          .tempad-top-strip {
+            display: none; /* Hide top strip in landscape to maximize 3D canvas height */
+          }
+          .tempad-main-bar {
+            padding: 4px 8px;
+            border-radius: 6px;
+          }
+          .tva-btn {
+            padding: 4px 8px;
+            font-size: 10px;
           }
           .station-dots-track {
             display: none;
@@ -305,10 +393,13 @@ export default function TemPadHUD({
             display: none;
           }
           .casefile-text {
-            font-size: 10px;
+            display: none;
           }
           .tour-toggle-btn span {
-            font-size: 10px;
+            display: none;
+          }
+          .mode-btn-text {
+            font-size: 9.5px;
           }
         }
       `}</style>

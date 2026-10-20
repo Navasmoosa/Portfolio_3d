@@ -9,6 +9,8 @@ import {
   Sparkles,
   HelpCircle,
   ExternalLink,
+  Eye,
+  BookOpen,
 } from 'lucide-react';
 import TVAWorld from './components/canvas/TVAWorld';
 import TemPadHUD from './components/ui/TemPadHUD';
@@ -29,6 +31,8 @@ export default function App() {
   const [showCaseFile, setShowCaseFile] = useState(false);
   const [isTalking, setIsTalking] = useState(false);
   const [showHelpGuide, setShowHelpGuide] = useState(false);
+  const [isFreeMode, setIsFreeMode] = useState(false);
+  const [orientation, setOrientation] = useState('portrait');
   const [playerTelemetry, setPlayerTelemetry] = useState({
     x: 0,
     z: 8,
@@ -37,6 +41,21 @@ export default function App() {
     distanceToStation: 0,
     activeStationIndex: 0,
   });
+
+  // Track orientation dynamically
+  useEffect(() => {
+    const checkOrientation = () => {
+      const isLandscape = window.innerWidth > window.innerHeight;
+      setOrientation(isLandscape ? 'landscape' : 'portrait');
+    };
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
 
   // Trigger celebration confetti at Nexus or Closing
   const triggerCelebration = useCallback(() => {
@@ -135,6 +154,8 @@ export default function App() {
         setIsMuted(muted);
       } else if (e.key.toLowerCase() === 't') {
         setIsAutoTour((prev) => !prev);
+      } else if (e.key.toLowerCase() === 'f') {
+        setIsFreeMode((prev) => !prev);
       } else if (e.key === 'Escape') {
         setSelectedApp(null);
         setShowCaseFile(false);
@@ -182,9 +203,31 @@ export default function App() {
               OPEN-WORLD 3D PORTFOLIO • {PERSONAL_INFO.title}
             </span>
           </div>
+
+          {/* Dynamic Media Mode & Orientation Pill */}
+          <div className="media-mode-pill" title={`Active Display: ${orientation} mode • ${isFreeMode ? '360° Free Roam' : 'Guided Story'}`}>
+            <span className="dot-indicator" />
+            <span className="orientation-text">{orientation === 'landscape' ? 'LANDSCAPE' : 'PORTRAIT'}</span>
+            <span className="mode-text">{isFreeMode ? 'FREE' : 'STORY'}</span>
+          </div>
         </div>
 
         <div className="header-actions">
+          {/* Free Mode / Story Mode Switcher */}
+          <button
+            onClick={() => {
+              soundEngine.playTemPadClick();
+              setIsFreeMode((prev) => !prev);
+            }}
+            className={`tva-btn mode-header-btn ${isFreeMode ? 'tva-btn-primary' : ''}`}
+            title={isFreeMode ? 'Switch to Guided Story Mode' : 'Switch to 360° Free Roam Mode (F key)'}
+          >
+            {isFreeMode ? <BookOpen size={15} /> : <Eye size={15} />}
+            <span className="btn-label-desktop">
+              {isFreeMode ? 'Story Mode' : 'Free Mode'}
+            </span>
+          </button>
+
           {/* Audio Mute/Unmute */}
           <button
             onClick={() => {
@@ -192,7 +235,7 @@ export default function App() {
               setIsMuted(muted);
             }}
             className="tva-btn"
-            title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
+            title={isMuted ? 'Unmute Audio (M key)' : 'Mute Audio (M key)'}
           >
             {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} className="text-amber-400" />}
           </button>
@@ -207,7 +250,7 @@ export default function App() {
             title="Navigation Guide"
           >
             <HelpCircle size={15} />
-            <span className="btn-label-desktop">User Guide</span>
+            <span className="btn-label-desktop">Guide</span>
           </button>
 
           {/* Open Resume */}
@@ -236,6 +279,7 @@ export default function App() {
         }}
         isTalking={isTalking}
         onPlayerTelemetry={setPlayerTelemetry}
+        isFreeMode={isFreeMode}
       />
 
       {/* 4. On-Screen Virtual D-Pad & Waypoint Quest Tracker */}
@@ -243,6 +287,10 @@ export default function App() {
         onStep={handleStep}
         playerTelemetry={playerTelemetry}
         currentStationIndex={currentStationIndex}
+        isFreeMode={isFreeMode}
+        onToggleFreeMode={setIsFreeMode}
+        onResetCamera={() => worldRef.current?.resetCamera?.()}
+        onStationSelect={handleManualStationSelect}
       />
 
       {/* 5. Miss Minutes Floating Companion Dialogue Card */}
@@ -260,6 +308,7 @@ export default function App() {
           soundEngine.playTemPadClick();
           setShowCaseFile(true);
         }}
+        isFreeMode={isFreeMode}
       />
 
       {/* 6. Contextual Station Information Overlay (Left / Bottom-Left) */}
@@ -275,6 +324,8 @@ export default function App() {
           setShowCaseFile(true);
         }}
         playerTelemetry={playerTelemetry}
+        isFreeMode={isFreeMode}
+        onToggleFreeMode={setIsFreeMode}
       />
 
       {/* 7. Bottom Floating HUD Controller (With Quick Travel & Audio) */}
@@ -286,6 +337,8 @@ export default function App() {
         isMuted={isMuted}
         onToggleMute={setIsMuted}
         onOpenCaseFile={() => setShowCaseFile(true)}
+        isFreeMode={isFreeMode}
+        onToggleFreeMode={setIsFreeMode}
       />
 
       {/* 8. App Showcase Modal (Disaster Management) */}
@@ -306,31 +359,84 @@ export default function App() {
         <div className="help-modal-backdrop" onClick={() => setShowHelpGuide(false)}>
           <div className="tva-panel help-card" onClick={(e) => e.stopPropagation()}>
             <div className="help-header">
-              <span className="card-badge">OPEN-WORLD GAME NAVIGATION GUIDE</span>
+              <span className="card-badge">OPEN-WORLD NAVIGATION & VIEW MODES</span>
               <h3>How To Explore Navas Moosa's 3D World</h3>
             </div>
             <ul className="help-list">
-              <li><strong>Arrow Keys (↑, ↓, ←, →) or (W, A, S, D):</strong> Click once to move 1 step forward, backward, left, or right! Hold down for continuous walking.</li>
-              <li><strong>Virtual D-Pad Controls:</strong> Click the on-screen Directional buttons in the bottom right to step in any direction.</li>
-              <li><strong>7 Station Destinations:</strong> Walk along the corridor to discover Scene 1 (Welcome), Scene 2 (About Me), Scene 3 (Experience), Scene 4 (Projects), Scene 5 (Skills), Scene 6 (Contact), and Scene 7 (Thank You)!</li>
-              <li><strong>Arrival Checkpoint Pads:</strong> Step onto the glowing circular waypoint pads on the floor at each station to unlock details.</li>
-              <li><strong>Miss Minutes Companion:</strong> Hovers alongside you as you walk, and explains each station when you arrive!</li>
-              <li><strong>Interactive 3D Demos:</strong> Click directly on the floating device consoles in Scene 4 to test the interactive <em>Disaster Management System</em> demo.</li>
-              <li><strong>Resume Button:</strong> View and print Navas's complete resume PDF anytime.</li>
-              <li><strong>'T' Key:</strong> Toggle Auto-Tour mode for a hands-free cinematic walkthrough.</li>
-              <li><strong>'M' Key:</strong> Toggle ambient sound and footsteps.</li>
+              <li><strong>Mobile Free Mode / Orbit View:</strong> Tap the <em>Free Mode</em> button or press 'F' key! In Free Mode, cards dock away so you have a 360° unobstructed view of the 3D TVA hall. Drag on the screen to rotate your view around your character, pinch to zoom in/out, and tap 'Reset Cam' to center.</li>
+              <li><strong>Landscape & Portrait Adaptation:</strong> In landscape (held horizontally), cards dock neatly to the left half with virtual D-Pad thumb controls on the right, keeping your character visible. In portrait, cards collapse into a scrollable bottom-sheet.</li>
+              <li><strong>Movement Controls (Arrow Keys / WASD):</strong> Press once to move 1 step forward, backward, left, or right, or hold down for continuous open-world walking!</li>
+              <li><strong>Virtual D-Pad Controls:</strong> Click or hold the on-screen Directional buttons in the bottom right corner.</li>
+              <li><strong>7 Timeline Stations:</strong> Walk down the golden corridor to unlock Scene 1 (Welcome), Scene 2 (About Me), Scene 3 (Experience), Scene 4 (Projects), Scene 5 (Skills), Scene 6 (Contact), and Scene 7 (Thank You)!</li>
+              <li><strong>Waypoint Checkpoint Pads:</strong> Step onto glowing circular waypoint rings to automatically trigger station records.</li>
+              <li><strong>Miss Minutes Guide:</strong> Flies alongside you down the timeline, explaining each milestone.</li>
+              <li><strong>'F' Key:</strong> Toggle between 360° Free Mode and Guided Story Mode.</li>
+              <li><strong>'T' Key:</strong> Toggle Auto-Tour for a hands-free cinematic walkthrough.</li>
+              <li><strong>'M' Key:</strong> Mute or unmute footsteps and ambient audio.</li>
             </ul>
             <button
               onClick={() => setShowHelpGuide(false)}
               className="tva-btn tva-btn-primary full-btn"
             >
-              Understood, Start Exploring
+              Got It, Start Exploring
             </button>
           </div>
         </div>
       )}
 
       <style>{`
+        .media-mode-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 3px 8px;
+          border-radius: 999px;
+          background: rgba(26, 23, 20, 0.7);
+          border: 1px solid rgba(229, 179, 66, 0.3);
+          font-family: var(--font-mono);
+          font-size: 10px;
+          color: #d6c7b2;
+          letter-spacing: 0.5px;
+          user-select: none;
+        }
+
+        .media-mode-pill .dot-indicator {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #34d399;
+          box-shadow: 0 0 6px rgba(52, 211, 153, 0.8);
+          animation: pulseDot 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseDot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .media-mode-pill .orientation-text {
+          color: #ffd868;
+          font-weight: 700;
+        }
+
+        .media-mode-pill .mode-text {
+          padding: 1px 5px;
+          background: rgba(245, 158, 11, 0.2);
+          border-radius: 4px;
+          color: #f59e0b;
+          font-weight: 700;
+        }
+
+        .mode-header-btn {
+          border-color: rgba(56, 189, 248, 0.4);
+          color: #38bdf8;
+        }
+
+        .mode-header-btn:hover {
+          border-color: #38bdf8;
+          background: rgba(56, 189, 248, 0.15);
+        }
+
         .help-modal-backdrop {
           position: fixed;
           inset: 0;
@@ -344,8 +450,10 @@ export default function App() {
         }
 
         .help-card {
-          width: 520px;
+          width: 560px;
           max-width: 100%;
+          max-height: 85vh;
+          overflow-y: auto;
           padding: 24px;
           border-radius: 12px;
           border: 1px solid var(--tva-gold);
@@ -373,6 +481,12 @@ export default function App() {
 
         .help-list strong {
           color: #ffd868;
+        }
+
+        @media (max-width: 768px) {
+          .media-mode-pill {
+            display: none;
+          }
         }
       `}</style>
     </main>

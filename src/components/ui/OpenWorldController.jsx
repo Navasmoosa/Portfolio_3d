@@ -8,8 +8,12 @@ import {
   Compass,
   MapPin,
   ChevronRight,
+  RotateCcw,
+  Eye,
+  BookOpen,
 } from 'lucide-react';
 import { STATIONS } from '../../data/portfolioData';
+import { soundEngine } from '../../utils/SoundEffects';
 
 export default function OpenWorldController({
   onStep,
@@ -17,6 +21,10 @@ export default function OpenWorldController({
   onWalkStop,
   playerTelemetry,
   currentStationIndex,
+  isFreeMode = false,
+  onToggleFreeMode,
+  onResetCamera,
+  onStationSelect,
 }) {
   const [activeDirection, setActiveDirection] = useState(null);
   const holdTimerRef = useRef(null);
@@ -25,10 +33,8 @@ export default function OpenWorldController({
   // Handle single click (one step) vs continuous hold
   const handleDirectionPress = (dir) => {
     setActiveDirection(dir);
-    // Execute one immediate step on click
     if (onStep) onStep(dir);
 
-    // If held for more than 280ms, begin continuous walk
     holdTimerRef.current = setTimeout(() => {
       if (onWalkStart) onWalkStart(dir);
       holdIntervalRef.current = setInterval(() => {
@@ -76,16 +82,26 @@ export default function OpenWorldController({
 
   return (
     <div className="openworld-controller-root">
-      {/* Top Floating Mini Quest / Waypoint Banner */}
-      <div className="waypoint-tracker-pill animate-fadeIn">
+      {/* Top Floating Waypoint / Mode Tracker Bar */}
+      <div className={`waypoint-tracker-pill animate-fadeIn ${isFreeMode ? 'free-mode-pill' : ''}`}>
         <div className="waypoint-main">
-          <MapPin size={13} className="text-amber-400" />
-          <span className="waypoint-zone-tag">
-            {isNear ? 'CURRENT LOCATION' : 'IN TRANSIT'}
-          </span>
-          <span className="waypoint-title">
-            {isNear ? currentStation.title : `Walking to ${nextStation.title}`}
-          </span>
+          {isFreeMode ? (
+            <>
+              <Eye size={14} className="text-cyan-400 animate-pulse" />
+              <span className="waypoint-zone-tag free-tag">FREE VIEW MODE</span>
+              <span className="waypoint-title">360° Open Exploration</span>
+            </>
+          ) : (
+            <>
+              <MapPin size={13} className="text-amber-400" />
+              <span className="waypoint-zone-tag">
+                {isNear ? 'CURRENT LOCATION' : 'IN TRANSIT'}
+              </span>
+              <span className="waypoint-title">
+                {isNear ? currentStation.title : `Walking to ${nextStation.title}`}
+              </span>
+            </>
+          )}
         </div>
 
         <div className="waypoint-stats">
@@ -93,20 +109,51 @@ export default function OpenWorldController({
             <Footprints size={12} className="text-cyan-400" />
             <span>{stepCount} Steps</span>
           </span>
-          {!isNear && distanceToNext > 0 && (
+          {!isFreeMode && !isNear && distanceToNext > 0 && (
             <span className="distance-tag">
               <Compass size={11} className="text-green-400" />
               <span>{distanceToNext}m</span>
             </span>
           )}
+          {isFreeMode && (
+            <button
+              onClick={() => {
+                soundEngine.playTemPadClick();
+                if (onResetCamera) onResetCamera();
+              }}
+              className="ctrl-cam-reset-btn"
+              title="Reset 360° camera behind character"
+            >
+              <RotateCcw size={11} />
+              <span>Reset Cam</span>
+            </button>
+          )}
         </div>
       </div>
 
+      {/* Free Mode Gesture Hint (Fades out gently) */}
+      {isFreeMode && (
+        <div className="free-mode-drag-hint animate-fadeIn">
+          <span>🖐️ Drag anywhere to look around 360° • Pinch to zoom</span>
+        </div>
+      )}
+
       {/* 4-Direction Virtual D-Pad / Controller Console */}
-      <div className="dpad-console tva-panel animate-slideUp">
+      <div className={`dpad-console tva-panel animate-slideUp ${isFreeMode ? 'dpad-free' : ''}`}>
         <div className="dpad-header">
-          <span className="dpad-label">WALK CONTROLS</span>
-          <span className="dpad-hint">1 CLICK = 1 STEP</span>
+          <span className="dpad-label">{isFreeMode ? 'FREE ROAM' : 'WALK'}</span>
+          {onResetCamera && (
+            <button
+              onClick={() => {
+                soundEngine.playTemPadClick();
+                onResetCamera();
+              }}
+              className="dpad-reset-link"
+              title="Reset Camera Behind Character"
+            >
+              <RotateCcw size={10} />
+            </button>
+          )}
         </div>
 
         <div className="dpad-cross-grid">
@@ -141,7 +188,13 @@ export default function OpenWorldController({
           </button>
 
           {/* CENTER COMPASS CORE */}
-          <div className="dpad-center-core">
+          <div
+            className="dpad-center-core"
+            onClick={() => {
+              if (onResetCamera) onResetCamera();
+            }}
+            title="Click to center camera"
+          >
             <Compass size={16} className="text-amber-400 animate-spin-slow" />
           </div>
 
@@ -371,20 +424,156 @@ export default function OpenWorldController({
           animation: spinSlow 12s linear infinite;
         }
 
+        /* Free Mode Styles */
+        .free-mode-pill {
+          border-color: rgba(56, 189, 248, 0.55);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(56, 189, 248, 0.25);
+        }
+
+        .free-tag {
+          color: #38bdf8 !important;
+        }
+
+        .ctrl-cam-reset-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: rgba(56, 189, 248, 0.15);
+          border: 1px solid rgba(56, 189, 248, 0.4);
+          color: #7dd3fc;
+          font-family: var(--font-mono);
+          font-size: 9.5px;
+          padding: 2px 7px;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .ctrl-cam-reset-btn:hover {
+          background: rgba(56, 189, 248, 0.3);
+          color: #fff;
+          border-color: #38bdf8;
+        }
+
+        .dpad-reset-link {
+          background: transparent;
+          border: none;
+          color: #fbbf24;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2px;
+          border-radius: 3px;
+          opacity: 0.8;
+          transition: opacity 0.2s;
+        }
+
+        .dpad-reset-link:hover {
+          opacity: 1;
+          color: #fff;
+        }
+
+        .dpad-free {
+          border-color: rgba(56, 189, 248, 0.4);
+          box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 25px rgba(56, 189, 248, 0.2);
+        }
+
+        .free-mode-drag-hint {
+          position: absolute;
+          top: 118px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(15, 12, 10, 0.8);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(56, 189, 248, 0.3);
+          border-radius: 20px;
+          padding: 5px 14px;
+          font-family: var(--font-mono);
+          font-size: 11px;
+          color: #bae6fd;
+          letter-spacing: 0.5px;
+          pointer-events: none;
+          z-index: 37;
+          white-space: nowrap;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+          animation: floatBob 3s ease-in-out infinite;
+        }
+
+        /* Responsive Media Modes: Portrait & Landscape */
         @media (max-width: 768px) {
           .dpad-console {
-            bottom: 85px;
+            bottom: 82px;
             right: 12px;
-            width: 145px;
+            width: 138px;
+            padding: 8px;
+            gap: 6px;
           }
           .dpad-cross-grid {
-            grid-template-columns: 38px 38px 38px;
-            grid-template-rows: 38px 38px 38px;
+            grid-template-columns: 36px 36px 36px;
+            grid-template-rows: 36px 36px 36px;
+            gap: 3px;
           }
           .waypoint-tracker-pill {
-            top: 65px;
+            top: 56px;
             font-size: 11px;
-            padding: 6px 12px;
+            padding: 5px 12px;
+            gap: 8px;
+            max-width: calc(100vw - 24px);
+          }
+          .free-mode-drag-hint {
+            top: 96px;
+            font-size: 9.5px;
+            padding: 4px 10px;
+          }
+        }
+
+        /* Mobile Landscape Media Mode */
+        @media (orientation: landscape) and (max-height: 520px) {
+          .waypoint-tracker-pill {
+            top: 42px;
+            left: 14px;
+            transform: none;
+            padding: 4px 10px;
+            gap: 8px;
+            font-size: 10px;
+            border-radius: 16px;
+          }
+          .waypoint-title {
+            font-size: 11px;
+          }
+          .waypoint-stats {
+            gap: 6px;
+            padding-left: 8px;
+          }
+          .step-counter-tag {
+            font-size: 9.5px;
+          }
+          .free-mode-drag-hint {
+            top: 42px;
+            left: 55%;
+            font-size: 9.5px;
+            padding: 3px 10px;
+          }
+          .dpad-console {
+            bottom: 8px;
+            right: 8px;
+            width: 122px;
+            padding: 6px;
+            gap: 3px;
+            border-radius: 12px;
+          }
+          .dpad-cross-grid {
+            grid-template-columns: 32px 32px 32px;
+            grid-template-rows: 32px 32px 32px;
+            gap: 2px;
+          }
+          .dpad-center-core {
+            width: 24px;
+            height: 24px;
+          }
+          .key-hint {
+            display: none;
           }
         }
       `}</style>

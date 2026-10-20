@@ -51,6 +51,8 @@ export default function StationOverlay({
   onAppSelect,
   onOpenCaseFile,
   playerTelemetry,
+  isFreeMode = false,
+  onToggleFreeMode,
 }) {
   const currentStation = STATIONS[currentStationIndex] || STATIONS[0];
 
@@ -59,6 +61,24 @@ export default function StationOverlay({
   useEffect(() => {
     setIsCollapsed(false);
   }, [currentStationIndex]);
+
+  if (isFreeMode) {
+    return (
+      <div className="station-overlay-container free-mode-dock">
+        <button
+          className="free-mode-exit-pill tva-panel animate-fadeIn"
+          onClick={() => {
+            soundEngine.playTemPadClick();
+            if (onToggleFreeMode) onToggleFreeMode(false);
+          }}
+          title="Exit Free View and Return to Story"
+        >
+          <BookOpen size={13} className="text-amber-400" />
+          <span>Exit Free Mode ({currentStation.title})</span>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="station-overlay-container">
@@ -1364,30 +1384,108 @@ export default function StationOverlay({
           margin-top: 4px;
         }
 
+        /* Free Mode Dock */
+        .free-mode-dock {
+          bottom: 78px;
+          left: 14px;
+          z-index: 45;
+        }
+
+        .free-mode-exit-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 16px;
+          border-radius: 20px;
+          border: 1px solid rgba(229, 179, 66, 0.55);
+          background: rgba(22, 17, 13, 0.92);
+          backdrop-filter: blur(14px);
+          color: #fef08a;
+          font-family: var(--font-mono);
+          font-size: 11.5px;
+          cursor: pointer;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 16px rgba(229, 179, 66, 0.25);
+          transition: all 0.25s ease;
+        }
+
+        .free-mode-exit-pill:hover {
+          border-color: #ffd868;
+          color: #fff;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 22px rgba(229, 179, 66, 0.45);
+        }
+
+        /* Mobile Portrait Media Mode */
         @media (max-width: 768px) {
           .station-overlay-container {
-            bottom: 85px;
-            left: 12px;
-            width: calc(100vw - 24px);
-            max-width: none;
+            bottom: 74px;
+            left: 10px;
+            width: calc(100vw - 156px);
+            max-width: calc(100vw - 156px);
+          }
+
+          .station-card {
+            padding: 14px 16px;
+            max-height: 48dvh;
+            border-radius: 12px;
+          }
+
+          .station-overlay-collapsed {
+            width: auto;
+            max-width: 220px;
+            padding: 8px 12px;
+          }
+
+          .collapsed-badge {
+            font-size: 11px;
+          }
+
+          .collapsed-sub {
+            display: none;
           }
 
           .wide-card {
             width: 100%;
           }
 
+          .hero-name {
+            font-size: 19px;
+            margin-top: 4px;
+          }
+
+          .hero-role {
+            font-size: 11.5px;
+            margin-bottom: 8px;
+          }
+
+          .meta-list {
+            gap: 4px;
+            margin-bottom: 8px;
+            font-size: 11px;
+          }
+
+          .quote-box {
+            padding: 6px 10px;
+            margin-bottom: 10px;
+          }
+
+          .quote-box p {
+            font-size: 11px;
+          }
+
           .aboutme-layout {
             flex-direction: column;
+            gap: 10px;
           }
 
           .navas-3d-showcase {
             width: 100%;
-            max-width: 240px;
-            align-items: center;
+            max-width: 190px;
+            margin: 0 auto;
           }
 
           .navas-avatar-frame {
-            height: 240px;
+            height: 180px;
             width: 100%;
           }
 
@@ -1397,6 +1495,121 @@ export default function StationOverlay({
 
           .nexus-links-grid {
             grid-template-columns: 1fr;
+          }
+
+          .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 6px;
+          }
+
+          .tva-btn-revisit {
+            min-width: 180px;
+            padding: 9px 18px;
+            font-size: 12px;
+          }
+        }
+
+        /* Mobile Landscape Media Mode */
+        @media (orientation: landscape) and (max-height: 520px) {
+          .station-overlay-container {
+            top: 44px;
+            bottom: 46px;
+            left: 10px;
+            width: min(360px, 44vw);
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+          }
+
+          .station-card {
+            padding: 12px 14px;
+            max-height: calc(100dvh - 98px);
+            border-radius: 10px;
+          }
+
+          .station-overlay-collapsed {
+            width: 210px;
+            padding: 6px 10px;
+          }
+
+          .collapsed-badge {
+            font-size: 10.5px;
+          }
+
+          .collapsed-sub {
+            font-size: 9px;
+          }
+
+          .wide-card {
+            width: 100%;
+          }
+
+          .hero-name {
+            font-size: 16px;
+            margin-top: 3px;
+          }
+
+          .hero-role {
+            font-size: 10.5px;
+            margin-bottom: 6px;
+          }
+
+          .meta-list {
+            gap: 3px;
+            margin-bottom: 6px;
+            font-size: 10.5px;
+          }
+
+          .quote-box {
+            padding: 6px 8px;
+            margin-bottom: 8px;
+          }
+
+          .quote-box p {
+            font-size: 10.5px;
+          }
+
+          .aboutme-layout {
+            flex-direction: row;
+            gap: 10px;
+          }
+
+          .navas-3d-showcase {
+            width: 110px;
+            flex-shrink: 0;
+          }
+
+          .navas-avatar-frame {
+            height: 140px;
+          }
+
+          .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 4px;
+          }
+
+          .stat-pill {
+            padding: 4px 8px;
+          }
+
+          .qual-cols {
+            grid-template-columns: 1fr;
+          }
+
+          .nexus-links-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .free-mode-dock {
+            top: auto;
+            bottom: 12px;
+            left: 12px;
+          }
+
+          .free-mode-exit-pill {
+            padding: 5px 12px;
+            font-size: 10px;
           }
         }
       `}</style>

@@ -9,11 +9,19 @@ export default function MissMinutesDialogue({
   onStationSelect,
   onAppSelect,
   onOpenCaseFile,
+  isFreeMode = false,
 }) {
   const currentStation = STATIONS[currentStationIndex] || STATIONS[0];
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
+
+  // Auto-minimize in Free Mode so canvas is unobstructed
+  useEffect(() => {
+    if (isFreeMode) {
+      setIsMinimized(true);
+    }
+  }, [isFreeMode]);
 
   // Typewriter effect when station changes
   useEffect(() => {
@@ -382,12 +390,89 @@ export default function MissMinutesDialogue({
 
         @media (max-width: 768px) {
           .miss-minutes-card {
-            top: 60px;
-            right: 12px;
-            width: calc(100vw - 24px);
+            top: 54px;
+            right: 10px;
+            width: calc(100vw - 20px);
+            max-width: 360px;
+          }
+          .miss-minutes-card.minimized {
+            width: auto;
+            max-width: 220px;
+          }
+          .mm-header {
+            padding: 8px 12px;
+          }
+          .mm-avatar-wrap {
+            width: 36px;
+            height: 36px;
+          }
+          .mm-name {
+            font-size: 12px;
+          }
+          .mm-body {
+            padding: 10px 12px;
+            gap: 10px;
           }
           .mm-text {
-            font-size: 12px;
+            font-size: 11.5px;
+          }
+          .mm-actions {
+            gap: 6px;
+          }
+          .mm-action-btn, .mm-voice-btn, .mm-next-btn {
+            padding: 6px 10px;
+            font-size: 10.5px;
+          }
+        }
+
+        /* Mobile Landscape Media Mode */
+        @media (orientation: landscape) and (max-height: 520px) {
+          .miss-minutes-card {
+            top: 38px;
+            right: 10px;
+            width: min(320px, 44vw);
+            max-width: 320px;
+            max-height: calc(100dvh - 48px);
+            overflow-y: auto;
+          }
+          .miss-minutes-card.minimized {
+            width: auto;
+            max-width: 190px;
+          }
+          .mm-header {
+            padding: 6px 10px;
+          }
+          .mm-avatar-wrap {
+            width: 30px;
+            height: 30px;
+          }
+          .mm-name {
+            font-size: 11px;
+          }
+          .mm-role {
+            display: none;
+          }
+          .mm-body {
+            padding: 8px 10px;
+            gap: 8px;
+          }
+          .mm-speech-bubble {
+            padding: 8px 10px;
+          }
+          .mm-bubble-tag {
+            font-size: 8px;
+            margin-bottom: 4px;
+          }
+          .mm-text {
+            font-size: 10.5px;
+            line-height: 1.45;
+          }
+          .mm-actions {
+            gap: 4px;
+          }
+          .mm-action-btn, .mm-voice-btn, .mm-next-btn {
+            padding: 5px 8px;
+            font-size: 10px;
           }
         }
       `}</style>
