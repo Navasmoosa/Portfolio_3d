@@ -70,9 +70,10 @@ export default function App() {
     [triggerCelebration]
   );
 
-  // Manual Quick Travel via HUD dots or Prev/Next
+  // Manual Quick Travel via HUD dots, Revisit button, or Prev/Next
   const handleManualStationSelect = useCallback(
     (newIndex) => {
+      setIsAutoTour(false);
       if (worldRef.current) {
         worldRef.current.teleportToStation(newIndex);
       }

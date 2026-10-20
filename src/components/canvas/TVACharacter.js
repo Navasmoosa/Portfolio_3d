@@ -391,6 +391,25 @@ export class TVACharacter {
     this.targetZ = Math.max(-60, Math.min(10.5, z));
   }
 
+  // Instantly teleport character to coordinates and reset walk animation state
+  teleport(x, z) {
+    this.targetX = Math.max(-3.2, Math.min(3.2, x));
+    this.targetZ = Math.max(-60, Math.min(10.5, z));
+    this.currentX = this.targetX;
+    this.currentZ = this.targetZ;
+    this.group.position.set(this.currentX, 0, this.currentZ);
+    this.isWalking = false;
+    this.targetAngle = Math.PI; // Face forward down the corridor
+    this.turnAngle = Math.PI;
+    this.group.rotation.y = Math.PI;
+    if (this.leftLeg) this.leftLeg.rotation.x = 0;
+    if (this.rightLeg) this.rightLeg.rotation.x = 0;
+    if (this.leftShinGroup) this.leftShinGroup.rotation.x = 0;
+    if (this.rightShinGroup) this.rightShinGroup.rotation.x = 0;
+    if (this.leftArm) this.leftArm.rotation.x = 0.08;
+    if (this.rightArm) this.rightArm.rotation.x = -0.08;
+  }
+
   // One discrete step on arrow click (Forward, Backward, Left, Right)
   step(direction, distance = 1.35) {
     let nextX = this.targetX;

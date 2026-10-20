@@ -33,6 +33,7 @@ const TVAWorld = React.forwardRef(function TVAWorld(
   const onAppSelectRef = useRef(onAppSelect);
   const isTalkingRef = useRef(isTalking);
   const activeStationIndexRef = useRef(currentStationIndex);
+  const teleportRef = useRef(null);
 
   // Keep callback refs updated without re-running Three.js setup
   useEffect(() => {
@@ -74,9 +75,17 @@ const TVAWorld = React.forwardRef(function TVAWorld(
       }
     },
     teleportToStation: (stationIndex) => {
-      const cp = STATION_CHECKPOINTS[stationIndex];
-      if (cp && characterRef.current) {
-        characterRef.current.setTargetPosition(0, cp.z);
+      if (teleportRef.current) {
+        teleportRef.current(stationIndex);
+      } else {
+        const cp = STATION_CHECKPOINTS[stationIndex];
+        if (cp && characterRef.current) {
+          if (characterRef.current.teleport) {
+            characterRef.current.teleport(0, cp.z);
+          } else {
+            characterRef.current.setTargetPosition(0, cp.z);
+          }
+        }
       }
     },
     getCharacter: () => characterRef.current,
@@ -931,6 +940,43 @@ const TVAWorld = React.forwardRef(function TVAWorld(
     let animationFrameId;
     let currentCamera = { x: 0, y: 2.0, z: 12.8 };
 
+    // Register active teleportation callback for instant travel (revisit portfolio, HUD clicks)
+    teleportRef.current = (stationIndex) => {
+      const cp = STATION_CHECKPOINTS[stationIndex];
+      if (!cp) return;
+
+      activeStationIndexRef.current = stationIndex;
+
+      if (navasCharacter) {
+        navasCharacter.teleport(0, cp.z);
+      }
+
+      // Snap camera directly behind player at target station
+      const camTargetX = 0;
+      const camTargetY = 2.05;
+      const camTargetZ = cp.z + 4.8;
+      currentCamera.x = camTargetX;
+      currentCamera.y = camTargetY;
+      currentCamera.z = camTargetZ;
+      camera.position.set(camTargetX, camTargetY, camTargetZ);
+      camera.lookAt(0, 1.45, cp.z - 2.8);
+
+      // Snap Miss Minutes to presentation coordinates
+      const stationData = STATIONS[stationIndex] || STATIONS[0];
+      if (missMinutes && stationData) {
+        missMinutes.setTargetPosition(
+          stationData.missMinutesPos.x,
+          stationData.missMinutesPos.y,
+          stationData.missMinutesPos.z
+        );
+        missMinutes.group.position.set(
+          stationData.missMinutesPos.x,
+          stationData.missMinutesPos.y,
+          stationData.missMinutesPos.z
+        );
+      }
+    };
+
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
 
@@ -1084,6 +1130,7 @@ const TVAWorld = React.forwardRef(function TVAWorld(
       window.removeEventListener('keyup', handleKeyUp);
       renderer.domElement.removeEventListener('pointerdown', handlePointerDown);
       cancelAnimationFrame(animationFrameId);
+      teleportRef.current = null;
       if (renderer.domElement && renderer.domElement.parentNode) {
         renderer.domElement.parentNode.removeChild(renderer.domElement);
       }
