@@ -17,6 +17,7 @@ import {
   FileText,
   Download,
   CheckCircle,
+  RotateCcw,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
@@ -46,6 +47,7 @@ const GithubIcon = ({ size = 18 }) => (
 
 export default function StationOverlay({
   currentStationIndex,
+  onStationSelect,
   onAppSelect,
   onOpenCaseFile,
   playerTelemetry,
@@ -529,9 +531,30 @@ export default function StationOverlay({
                 "Thank you for exploring my interactive portfolio! Feel free to connect, collaborate, or download my comprehensive resume."
               </p>
 
+              {/* Revisit Portfolio Call to Action */}
+              <div className="revisit-portfolio-box">
+                <span className="revisit-prompt-badge">FINISHED YOUR TOUR?</span>
+                <p className="revisit-prompt-text">
+                  Would you like to experience the interactive portfolio again from the beginning?
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundEngine.playChronoChime();
+                    if (onStationSelect) {
+                      onStationSelect(0);
+                    }
+                  }}
+                  className="tva-btn tva-btn-revisit full-btn"
+                >
+                  <RotateCcw size={16} />
+                  <span>Revisit the Portfolio</span>
+                </button>
+              </div>
+
               <button
                 onClick={onOpenCaseFile}
-                className="tva-btn tva-btn-primary full-btn"
+                className="tva-btn tva-btn-primary full-btn resume-download-btn"
               >
                 <Award size={18} />
                 <span>Download Full Resume (PDF)</span>
@@ -1228,6 +1251,67 @@ export default function StationOverlay({
           color: #ffd868;
           margin: 6px 0 12px 0;
           letter-spacing: 1px;
+        }
+
+        .revisit-portfolio-box {
+          margin: 14px 0 10px 0;
+          padding: 12px 14px;
+          border-radius: 8px;
+          background: rgba(30, 24, 18, 0.75);
+          border: 1px dashed rgba(229, 179, 66, 0.45);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 7px;
+          box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .revisit-prompt-badge {
+          font-family: var(--font-mono);
+          font-size: 8.5px;
+          font-weight: 700;
+          letter-spacing: 1px;
+          color: #fbbf24;
+          background: rgba(245, 158, 11, 0.15);
+          padding: 2px 8px;
+          border-radius: 4px;
+          border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+
+        .revisit-prompt-text {
+          font-size: 11.5px;
+          color: #e2e8f0;
+          margin: 0;
+          line-height: 1.4;
+        }
+
+        .tva-btn-revisit {
+          margin-top: 4px;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(229, 179, 66, 0.18) 100%);
+          border: 1px solid rgba(229, 179, 66, 0.6);
+          color: #fef08a;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 10px 16px;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 14px rgba(229, 179, 66, 0.25);
+        }
+
+        .tva-btn-revisit:hover {
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.5) 0%, rgba(229, 179, 66, 0.35) 100%);
+          border-color: #ffd868;
+          color: #ffffff;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 22px rgba(229, 179, 66, 0.5);
+        }
+
+        .resume-download-btn {
+          margin-top: 4px;
         }
 
         @media (max-width: 768px) {

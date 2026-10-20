@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, MessageSquare, ChevronRight, X, Volume2, ExternalLink, FileText } from 'lucide-react';
+import { Sparkles, MessageSquare, ChevronRight, X, Volume2, ExternalLink, FileText, RotateCcw } from 'lucide-react';
 import { STATIONS, PERSONAL_INFO, APPS_DATA } from '../../data/portfolioData';
 import { soundEngine } from '../../utils/SoundEffects';
 
 export default function MissMinutesDialogue({
   currentStationIndex,
   onNextStation,
+  onStationSelect,
   onAppSelect,
   onOpenCaseFile,
 }) {
@@ -163,7 +164,7 @@ export default function MissMinutesDialogue({
               <span>Chime</span>
             </button>
 
-            {currentStationIndex < STATIONS.length - 1 && (
+            {currentStationIndex < STATIONS.length - 1 ? (
               <button
                 onClick={onNextStation}
                 className="tva-btn mm-next-btn"
@@ -171,6 +172,20 @@ export default function MissMinutesDialogue({
                 <span>Continue Tour</span>
                 <ChevronRight size={14} />
               </button>
+            ) : (
+              onStationSelect && (
+                <button
+                  onClick={() => {
+                    soundEngine.playChronoChime();
+                    onStationSelect(0);
+                  }}
+                  className="tva-btn mm-next-btn"
+                  title="Move back to the welcome section"
+                >
+                  <RotateCcw size={13} />
+                  <span>Revisit Portfolio</span>
+                </button>
+              )
             )}
           </div>
         </div>

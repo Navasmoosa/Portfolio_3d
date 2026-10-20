@@ -250,6 +250,7 @@ export default function App() {
         onNextStation={() =>
           handleManualStationSelect(Math.min(currentStationIndex + 1, STATIONS.length - 1))
         }
+        onStationSelect={handleManualStationSelect}
         onAppSelect={(appId) => {
           soundEngine.playTemPadClick();
           setSelectedApp(appId);
@@ -263,6 +264,7 @@ export default function App() {
       {/* 6. Contextual Station Information Overlay (Left / Bottom-Left) */}
       <StationOverlay
         currentStationIndex={currentStationIndex}
+        onStationSelect={handleManualStationSelect}
         onAppSelect={(appId) => {
           soundEngine.playTemPadClick();
           setSelectedApp(appId);
