@@ -1418,30 +1418,73 @@ export default function StationOverlay({
         /* Mobile Portrait Media Mode */
         @media (max-width: 768px) {
           .station-overlay-container {
-            bottom: 74px;
+            position: fixed;
+            bottom: 56px;
             left: 10px;
-            width: calc(100vw - 156px);
-            max-width: calc(100vw - 156px);
-          }
-
-          .station-card {
-            padding: 14px 16px;
-            max-height: 48dvh;
-            border-radius: 12px;
+            right: 10px;
+            width: auto;
+            max-width: 480px;
+            margin: 0 auto;
+            z-index: 45;
+            pointer-events: auto;
           }
 
           .station-overlay-collapsed {
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: auto;
-            max-width: 220px;
-            padding: 8px 12px;
+            max-width: calc(100vw - 160px);
+            padding: 8px 14px;
+            border-radius: 20px;
+            background: rgba(22, 17, 13, 0.95);
+            border: 1px solid rgba(229, 179, 66, 0.5);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85), 0 0 16px rgba(229, 179, 66, 0.35);
           }
 
           .collapsed-badge {
             font-size: 11px;
+            color: #ffd868;
+            font-weight: 700;
           }
 
           .collapsed-sub {
-            display: none;
+            display: block;
+            font-size: 9px;
+            color: #94a3b8;
+          }
+
+          .station-card {
+            padding: 16px;
+            max-height: 56dvh;
+            border-radius: 14px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            background: rgba(22, 17, 13, 0.95);
+            border: 1.5px solid rgba(229, 179, 66, 0.45);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.95), 0 0 30px rgba(229, 179, 66, 0.25);
+          }
+
+          .overlay-dock-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 0 2px;
+          }
+
+          .card-minimize-btn {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            color: #fef08a;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
           }
 
           .wide-card {
@@ -1449,88 +1492,116 @@ export default function StationOverlay({
           }
 
           .hero-name {
-            font-size: 19px;
+            font-size: 20px;
             margin-top: 4px;
           }
 
           .hero-role {
-            font-size: 11.5px;
+            font-size: 12px;
             margin-bottom: 8px;
           }
 
           .meta-list {
-            gap: 4px;
-            margin-bottom: 8px;
-            font-size: 11px;
+            gap: 6px;
+            margin-bottom: 10px;
+            font-size: 11.5px;
           }
 
           .quote-box {
-            padding: 6px 10px;
-            margin-bottom: 10px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
           }
 
           .quote-box p {
-            font-size: 11px;
+            font-size: 11.5px;
           }
 
           .aboutme-layout {
             flex-direction: column;
-            gap: 10px;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
           }
 
           .navas-3d-showcase {
-            width: 100%;
-            max-width: 190px;
+            width: 130px;
             margin: 0 auto;
           }
 
           .navas-avatar-frame {
-            height: 180px;
-            width: 100%;
-          }
-
-          .qual-cols {
-            grid-template-columns: 1fr;
-          }
-
-          .nexus-links-grid {
-            grid-template-columns: 1fr;
+            height: 130px;
+            width: 130px;
+            border-radius: 12px;
           }
 
           .stats-grid {
             grid-template-columns: 1fr;
             gap: 6px;
+            width: 100%;
+          }
+
+          .stat-pill {
+            padding: 6px 10px;
+          }
+
+          .highlights-row {
+            justify-content: center;
+            gap: 6px;
+          }
+
+          .qual-cols {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+
+          .nexus-links-grid {
+            grid-template-columns: 1fr;
+            gap: 8px;
           }
 
           .tva-btn-revisit {
             min-width: 180px;
-            padding: 9px 18px;
+            padding: 10px 20px;
             font-size: 12px;
+          }
+
+          .free-mode-dock {
+            position: fixed;
+            bottom: 56px;
+            left: 12px;
+            z-index: 45;
           }
         }
 
         /* Mobile Landscape Media Mode */
         @media (orientation: landscape) and (max-height: 520px) {
           .station-overlay-container {
-            top: 44px;
-            bottom: 46px;
-            left: 10px;
-            width: min(360px, 44vw);
-            max-width: 360px;
+            position: absolute;
+            top: 40px;
+            bottom: 6px;
+            left: 8px;
+            right: auto;
+            width: min(330px, 44vw);
+            max-width: 330px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
+            z-index: 45;
           }
 
           .station-card {
-            padding: 12px 14px;
-            max-height: calc(100dvh - 98px);
+            padding: 10px 12px;
+            max-height: calc(100dvh - 50px);
             border-radius: 10px;
+            overflow-y: auto;
           }
 
           .station-overlay-collapsed {
-            width: 210px;
+            position: relative;
+            width: auto;
+            max-width: 210px;
             padding: 6px 10px;
+            border-radius: 16px;
           }
 
           .collapsed-badge {
@@ -1538,7 +1609,7 @@ export default function StationOverlay({
           }
 
           .collapsed-sub {
-            font-size: 9px;
+            display: none;
           }
 
           .wide-card {
@@ -1567,21 +1638,23 @@ export default function StationOverlay({
           }
 
           .quote-box p {
-            font-size: 10.5px;
+            font-size: 10px;
           }
 
           .aboutme-layout {
             flex-direction: row;
             gap: 10px;
+            align-items: flex-start;
+            text-align: left;
           }
 
           .navas-3d-showcase {
-            width: 110px;
+            width: 100px;
             flex-shrink: 0;
           }
 
           .navas-avatar-frame {
-            height: 140px;
+            height: 120px;
           }
 
           .stats-grid {
@@ -1602,14 +1675,15 @@ export default function StationOverlay({
           }
 
           .free-mode-dock {
+            position: absolute;
             top: auto;
-            bottom: 12px;
-            left: 12px;
+            bottom: 8px;
+            left: 8px;
           }
 
           .free-mode-exit-pill {
-            padding: 5px 12px;
-            font-size: 10px;
+            padding: 4px 10px;
+            font-size: 9.5px;
           }
         }
       `}</style>

@@ -595,8 +595,21 @@ export default function TVACaseFileModal({ onClose }) {
         }
 
         @media (max-width: 640px) {
+          .casefile-modal-backdrop {
+            padding: 8px;
+          }
+          .casefile-modal-window {
+            max-height: 94dvh;
+            border-radius: 8px;
+          }
+          .casefile-header {
+            padding: 10px 12px;
+          }
+          .header-tag span {
+            font-size: 9.5px;
+          }
           .dossier-paper {
-            padding: 20px;
+            padding: 16px 14px;
           }
           .skills-grid {
             grid-template-columns: 1fr;
@@ -604,7 +617,18 @@ export default function TVACaseFileModal({ onClose }) {
           .dossier-candidate-header {
             flex-direction: column-reverse;
             align-items: flex-start;
-            gap: 12px;
+            gap: 10px;
+          }
+          .candidate-name {
+            font-size: 20px;
+          }
+          .candidate-contacts {
+            font-size: 11px;
+            gap: 8px;
+          }
+          .tva-seal-emblem {
+            width: 60px;
+            height: 60px;
           }
         }
       `}</style>

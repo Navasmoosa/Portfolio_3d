@@ -54,6 +54,7 @@ export default function MissMinutesDialogue({
     <aside
       aria-label="Interactive Virtual Guide Box"
       className={`miss-minutes-card ${isMinimized ? 'minimized' : ''}`}
+      onClick={isMinimized ? () => { soundEngine.playTemPadClick(); setIsMinimized(false); } : undefined}
     >
       {/* Header with Miss Minutes Hologram Avatar */}
       <div className="mm-header">
@@ -75,7 +76,11 @@ export default function MissMinutesDialogue({
         </div>
 
         <button
-          onClick={() => setIsMinimized(!isMinimized)}
+          onClick={(e) => {
+            e.stopPropagation();
+            soundEngine.playTemPadClick();
+            setIsMinimized(!isMinimized);
+          }}
           className="mm-toggle-btn"
           title={isMinimized ? 'Expand Guide' : 'Minimize'}
         >
@@ -390,14 +395,47 @@ export default function MissMinutesDialogue({
 
         @media (max-width: 768px) {
           .miss-minutes-card {
-            top: 54px;
+            top: 52px;
+            left: 10px;
             right: 10px;
-            width: calc(100vw - 20px);
-            max-width: 360px;
+            width: auto;
+            max-width: 380px;
+            margin: 0 auto;
+            z-index: 55;
+            border-radius: 14px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(249, 115, 22, 0.35);
           }
           .miss-minutes-card.minimized {
-            width: auto;
-            max-width: 220px;
+            top: 52px;
+            right: 10px;
+            left: auto;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            padding: 0;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid #ff7700;
+            box-shadow: 0 0 16px rgba(255, 119, 0, 0.7);
+            z-index: 40;
+          }
+          .miss-minutes-card.minimized .mm-header {
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            border-bottom: none;
+            justify-content: center;
+          }
+          .miss-minutes-card.minimized .mm-identity,
+          .miss-minutes-card.minimized .mm-toggle-btn {
+            display: none;
+          }
+          .miss-minutes-card.minimized .mm-avatar-wrap {
+            width: 100%;
+            height: 100%;
+            border: none;
+            box-shadow: none;
+            animation: none;
           }
           .mm-header {
             padding: 8px 12px;
@@ -428,51 +466,81 @@ export default function MissMinutesDialogue({
         /* Mobile Landscape Media Mode */
         @media (orientation: landscape) and (max-height: 520px) {
           .miss-minutes-card {
-            top: 38px;
-            right: 10px;
-            width: min(320px, 44vw);
-            max-width: 320px;
-            max-height: calc(100dvh - 48px);
+            top: 40px;
+            right: 8px;
+            left: auto;
+            width: min(300px, 40vw);
+            max-width: 300px;
+            max-height: calc(100dvh - 50px);
             overflow-y: auto;
+            z-index: 55;
           }
           .miss-minutes-card.minimized {
-            width: auto;
-            max-width: 190px;
+            top: 40px;
+            right: 8px;
+            left: auto;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            padding: 0;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid #ff7700;
+            box-shadow: 0 0 12px rgba(255, 119, 0, 0.6);
+            z-index: 40;
+          }
+          .miss-minutes-card.minimized .mm-header {
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            border-bottom: none;
+            justify-content: center;
+          }
+          .miss-minutes-card.minimized .mm-identity,
+          .miss-minutes-card.minimized .mm-toggle-btn {
+            display: none;
+          }
+          .miss-minutes-card.minimized .mm-avatar-wrap {
+            width: 100%;
+            height: 100%;
+            border: none;
+            box-shadow: none;
+            animation: none;
           }
           .mm-header {
-            padding: 6px 10px;
+            padding: 5px 8px;
           }
           .mm-avatar-wrap {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
           }
           .mm-name {
-            font-size: 11px;
+            font-size: 10.5px;
           }
           .mm-role {
             display: none;
           }
           .mm-body {
-            padding: 8px 10px;
-            gap: 8px;
+            padding: 6px 8px;
+            gap: 6px;
           }
           .mm-speech-bubble {
-            padding: 8px 10px;
+            padding: 6px 8px;
           }
           .mm-bubble-tag {
-            font-size: 8px;
-            margin-bottom: 4px;
+            font-size: 7.5px;
+            margin-bottom: 2px;
           }
           .mm-text {
-            font-size: 10.5px;
-            line-height: 1.45;
+            font-size: 10px;
+            line-height: 1.4;
           }
           .mm-actions {
             gap: 4px;
           }
           .mm-action-btn, .mm-voice-btn, .mm-next-btn {
-            padding: 5px 8px;
-            font-size: 10px;
+            padding: 4px 6px;
+            font-size: 9.5px;
           }
         }
       `}</style>

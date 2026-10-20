@@ -205,9 +205,17 @@ export default function App() {
           </div>
 
           {/* Dynamic Media Mode & Orientation Pill */}
-          <div className="media-mode-pill" title={`Active Display: ${orientation} mode • ${isFreeMode ? '360° Free Roam' : 'Guided Story'}`}>
+          <div
+            className="media-mode-pill"
+            onClick={() => {
+              soundEngine.playTemPadClick();
+              setIsFreeMode((prev) => !prev);
+            }}
+            style={{ cursor: 'pointer' }}
+            title={`Active Display: ${orientation.toUpperCase()} • ${isFreeMode ? '360° Free Roam' : 'Guided Story'} (Tap to Toggle)`}
+          >
             <span className="dot-indicator" />
-            <span className="orientation-text">{orientation === 'landscape' ? 'LANDSCAPE' : 'PORTRAIT'}</span>
+            <span className="orientation-text">{orientation === 'landscape' ? 'LAND' : 'PORT'}</span>
             <span className="mode-text">{isFreeMode ? 'FREE' : 'STORY'}</span>
           </div>
         </div>
@@ -224,7 +232,7 @@ export default function App() {
           >
             {isFreeMode ? <BookOpen size={15} /> : <Eye size={15} />}
             <span className="btn-label-desktop">
-              {isFreeMode ? 'Story Mode' : 'Free Mode'}
+              {isFreeMode ? 'Story' : 'Free'}
             </span>
           </button>
 
@@ -263,7 +271,7 @@ export default function App() {
             title="View and Download Resume"
           >
             <FileText size={15} />
-            <span>Resume</span>
+            <span className="btn-label-desktop">Resume</span>
           </button>
         </div>
       </header>
@@ -363,8 +371,8 @@ export default function App() {
               <h3>How To Explore Navas Moosa's 3D World</h3>
             </div>
             <ul className="help-list">
-              <li><strong>Mobile Free Mode / Orbit View:</strong> Tap the <em>Free Mode</em> button or press 'F' key! In Free Mode, cards dock away so you have a 360° unobstructed view of the 3D TVA hall. Drag on the screen to rotate your view around your character, pinch to zoom in/out, and tap 'Reset Cam' to center.</li>
-              <li><strong>Landscape & Portrait Adaptation:</strong> In landscape (held horizontally), cards dock neatly to the left half with virtual D-Pad thumb controls on the right, keeping your character visible. In portrait, cards collapse into a scrollable bottom-sheet.</li>
+              <li><strong>Mobile Free Mode / Orbit View:</strong> Tap the <em>Free Mode</em> button, tap the Media Mode pill, or press 'F' key! In Free Mode, cards dock away so you have a 360° unobstructed view of the 3D TVA hall. Drag on the screen to rotate your view around your character, pinch to zoom in/out, and tap 'Reset Cam' to center.</li>
+              <li><strong>Landscape & Portrait Adaptation:</strong> In landscape (held horizontally), cards dock neatly to the left half with virtual D-Pad thumb controls on the right, keeping your character visible. In portrait, cards expand into a full-width bottom sheet or collapse to a compact walking pill.</li>
               <li><strong>Movement Controls (Arrow Keys / WASD):</strong> Press once to move 1 step forward, backward, left, or right, or hold down for continuous open-world walking!</li>
               <li><strong>Virtual D-Pad Controls:</strong> Click or hold the on-screen Directional buttons in the bottom right corner.</li>
               <li><strong>7 Timeline Stations:</strong> Walk down the golden corridor to unlock Scene 1 (Welcome), Scene 2 (About Me), Scene 3 (Experience), Scene 4 (Projects), Scene 5 (Skills), Scene 6 (Contact), and Scene 7 (Thank You)!</li>
@@ -391,13 +399,19 @@ export default function App() {
           gap: 6px;
           padding: 3px 8px;
           border-radius: 999px;
-          background: rgba(26, 23, 20, 0.7);
-          border: 1px solid rgba(229, 179, 66, 0.3);
+          background: rgba(26, 23, 20, 0.85);
+          border: 1px solid rgba(229, 179, 66, 0.4);
           font-family: var(--font-mono);
           font-size: 10px;
           color: #d6c7b2;
           letter-spacing: 0.5px;
           user-select: none;
+          transition: all 0.2s ease;
+        }
+
+        .media-mode-pill:hover {
+          border-color: #ffd868;
+          transform: scale(1.03);
         }
 
         .media-mode-pill .dot-indicator {
@@ -421,7 +435,7 @@ export default function App() {
 
         .media-mode-pill .mode-text {
           padding: 1px 5px;
-          background: rgba(245, 158, 11, 0.2);
+          background: rgba(245, 158, 11, 0.25);
           border-radius: 4px;
           color: #f59e0b;
           font-weight: 700;
@@ -484,8 +498,83 @@ export default function App() {
         }
 
         @media (max-width: 768px) {
-          .media-mode-pill {
+          .tva-header-bar {
+            height: 48px;
+            padding: 0 10px;
+          }
+          .tva-logo-wrap {
+            gap: 6px;
+          }
+          .tva-logo-badge {
+            width: 28px;
+            height: 28px;
+            font-size: 11px;
+          }
+          .tva-main-title {
+            font-size: 12px;
+            letter-spacing: 0.5px;
+          }
+          .tva-sub-title {
             display: none;
+          }
+          .media-mode-pill {
+            display: inline-flex;
+            padding: 2px 6px;
+            gap: 4px;
+            font-size: 8.5px;
+          }
+          .media-mode-pill .mode-text {
+            padding: 0 3px;
+            font-size: 8px;
+          }
+          .header-actions {
+            gap: 5px;
+          }
+          .tva-btn {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+          }
+          .btn-label-desktop {
+            display: none !important;
+          }
+        }
+
+        @media (orientation: landscape) and (max-height: 520px) {
+          .tva-header-bar {
+            height: 38px;
+            padding: 0 10px;
+          }
+          .tva-logo-badge {
+            width: 24px;
+            height: 24px;
+            font-size: 10px;
+          }
+          .tva-main-title {
+            font-size: 11px;
+          }
+          .tva-sub-title {
+            display: none;
+          }
+          .media-mode-pill {
+            display: inline-flex;
+            padding: 1px 5px;
+            font-size: 8px;
+          }
+          .header-actions {
+            gap: 4px;
+          }
+          .tva-btn {
+            width: 26px;
+            height: 26px;
+            padding: 0;
+          }
+          .btn-label-desktop {
+            display: none !important;
           }
         }
       `}</style>

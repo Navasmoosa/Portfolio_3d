@@ -503,74 +503,104 @@ export default function OpenWorldController({
         /* Responsive Media Modes: Portrait & Landscape */
         @media (max-width: 768px) {
           .dpad-console {
-            bottom: 82px;
-            right: 12px;
-            width: 138px;
-            padding: 8px;
-            gap: 6px;
+            bottom: 56px;
+            right: 10px;
+            width: 130px;
+            padding: 6px;
+            gap: 4px;
+            border-radius: 14px;
+            z-index: 42;
+          }
+          .dpad-header {
+            font-size: 8px;
+            padding: 0;
           }
           .dpad-cross-grid {
-            grid-template-columns: 36px 36px 36px;
-            grid-template-rows: 36px 36px 36px;
+            grid-template-columns: 34px 34px 34px;
+            grid-template-rows: 34px 34px 34px;
             gap: 3px;
           }
+          .key-hint {
+            display: none;
+          }
           .waypoint-tracker-pill {
-            top: 56px;
+            top: 52px;
+            left: 10px;
+            right: auto;
+            transform: none;
+            font-size: 10px;
+            padding: 4px 10px;
+            gap: 6px;
+            max-width: calc(100vw - 64px);
+            z-index: 38;
+          }
+          .waypoint-title {
             font-size: 11px;
-            padding: 5px 12px;
-            gap: 8px;
-            max-width: calc(100vw - 24px);
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
           .free-mode-drag-hint {
-            top: 96px;
-            font-size: 9.5px;
-            padding: 4px 10px;
+            top: 86px;
+            font-size: 9px;
+            padding: 3px 10px;
+            white-space: normal;
+            text-align: center;
+            max-width: 90vw;
           }
         }
 
         /* Mobile Landscape Media Mode */
         @media (orientation: landscape) and (max-height: 520px) {
           .waypoint-tracker-pill {
-            top: 42px;
-            left: 14px;
+            top: 40px;
+            left: 10px;
             transform: none;
-            padding: 4px 10px;
-            gap: 8px;
-            font-size: 10px;
-            border-radius: 16px;
+            padding: 3px 8px;
+            gap: 6px;
+            font-size: 9.5px;
+            border-radius: 14px;
+            max-width: 40vw;
           }
           .waypoint-title {
-            font-size: 11px;
+            font-size: 10px;
+            max-width: 130px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
           .waypoint-stats {
-            gap: 6px;
-            padding-left: 8px;
+            gap: 4px;
+            padding-left: 6px;
           }
           .step-counter-tag {
-            font-size: 9.5px;
+            font-size: 9px;
           }
           .free-mode-drag-hint {
-            top: 42px;
-            left: 55%;
-            font-size: 9.5px;
-            padding: 3px 10px;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            padding: 2px 8px;
           }
           .dpad-console {
-            bottom: 8px;
+            bottom: 6px;
             right: 8px;
-            width: 122px;
-            padding: 6px;
-            gap: 3px;
-            border-radius: 12px;
+            width: 114px;
+            padding: 4px;
+            gap: 2px;
+            border-radius: 10px;
+            z-index: 42;
           }
           .dpad-cross-grid {
-            grid-template-columns: 32px 32px 32px;
-            grid-template-rows: 32px 32px 32px;
+            grid-template-columns: 30px 30px 30px;
+            grid-template-rows: 30px 30px 30px;
             gap: 2px;
           }
           .dpad-center-core {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
           }
           .key-hint {
             display: none;

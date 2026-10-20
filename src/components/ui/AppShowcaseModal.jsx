@@ -682,8 +682,26 @@ export default function AppShowcaseModal({ appId, onClose }) {
         }
 
         @media (max-width: 840px) {
+          .app-modal-backdrop {
+            padding: 8px;
+          }
+          .app-modal-window {
+            max-height: 92dvh;
+            border-radius: 10px;
+          }
+          .modal-header {
+            padding: 12px 16px;
+          }
+          .modal-app-title {
+            font-size: 17px;
+          }
           .modal-content-grid {
             grid-template-columns: 1fr;
+            gap: 16px;
+            padding: 14px;
+          }
+          .device-frame {
+            max-width: 100%;
           }
         }
       `}</style>

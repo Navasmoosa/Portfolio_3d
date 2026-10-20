@@ -332,36 +332,54 @@ export default function TemPadHUD({
         /* Mobile Portrait Media Mode */
         @media (max-width: 768px) {
           .tempad-hud-container {
-            bottom: 8px;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
             width: calc(100% - 16px);
-            gap: 6px;
+            max-width: 440px;
+            gap: 0;
+            z-index: 40;
           }
           .tempad-top-strip {
-            padding: 4px 10px;
-          }
-          .tempad-sector-badge {
-            font-size: 10px;
-          }
-          .station-dots-track {
             display: none;
           }
           .tempad-main-bar {
+            padding: 4px 8px;
+            height: 44px;
+            border-radius: 22px;
+            background: rgba(20, 16, 12, 0.95);
+            border: 1px solid rgba(229, 179, 66, 0.45);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85), 0 0 15px rgba(229, 179, 66, 0.2);
+            justify-content: space-between;
+          }
+          .tempad-nav-group {
+            gap: 4px;
+          }
+          .tempad-step-btn {
             padding: 6px 10px;
+            border-radius: 16px;
           }
           .btn-label-desktop {
             display: none;
           }
-          .casefile-text {
-            display: none;
+          .tempad-center-group {
+            gap: 6px;
+          }
+          .mode-switch-btn {
+            padding: 4px 10px;
+            border-radius: 16px;
           }
           .mode-btn-text {
             font-size: 10px;
+            font-weight: 700;
           }
-          .tour-toggle-btn span {
-            font-size: 9.5px;
+          .tour-toggle-btn {
+            padding: 4px 8px;
+            border-radius: 16px;
+            font-size: 9px;
           }
-          .tempad-step-btn {
-            padding: 6px 10px;
+          .tempad-actions-group {
+            display: none; /* Mute and Resume already present in Top Header */
           }
         }
 
@@ -371,35 +389,54 @@ export default function TemPadHUD({
             bottom: 6px;
             left: 50%;
             transform: translateX(-50%);
-            width: calc(100% - 150px);
-            max-width: 520px;
-            gap: 3px;
+            width: auto;
+            max-width: 320px;
+            gap: 0;
+            z-index: 40;
           }
           .tempad-top-strip {
-            display: none; /* Hide top strip in landscape to maximize 3D canvas height */
+            display: none;
           }
           .tempad-main-bar {
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 3px 8px;
+            height: 36px;
+            border-radius: 18px;
+            background: rgba(20, 16, 12, 0.94);
+            border: 1px solid rgba(229, 179, 66, 0.4);
+            gap: 6px;
+            justify-content: center;
           }
-          .tva-btn {
-            padding: 4px 8px;
+          .tempad-nav-group {
+            gap: 4px;
+          }
+          .tempad-step-btn {
+            padding: 3px 8px;
             font-size: 10px;
-          }
-          .station-dots-track {
-            display: none;
+            border-radius: 12px;
           }
           .btn-label-desktop {
             display: none;
           }
-          .casefile-text {
-            display: none;
+          .tempad-center-group {
+            gap: 4px;
+          }
+          .mode-switch-btn {
+            padding: 3px 8px;
+            border-radius: 12px;
+          }
+          .mode-btn-text {
+            font-size: 9px;
+          }
+          .tour-toggle-btn {
+            padding: 3px 6px;
+            font-size: 8.5px;
+            border-radius: 12px;
           }
           .tour-toggle-btn span {
             display: none;
           }
-          .mode-btn-text {
-            font-size: 9.5px;
+          .tempad-actions-group {
+            display: none;
           }
         }
       `}</style>
