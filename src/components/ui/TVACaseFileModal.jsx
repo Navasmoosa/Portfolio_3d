@@ -203,13 +203,12 @@ export default function TVACaseFileModal({ onClose }) {
             </div>
           </section>
 
-          {/* Official Sign-off Stamp */}
+          {/* Official Sign-off */}
           <div className="dossier-footer">
             <div className="seal-signature">
               <span className="approved-text">VERIFIED PROFESSIONAL RESUME • NAVAS MOOSA K P</span>
               <span className="sacred-motto">"FULL-STACK DEVELOPER • READY FOR COLLABORATION"</span>
             </div>
-            <div className="tva-wax-stamp">VERIFIED CV</div>
           </div>
         </div>
       </div >
@@ -572,18 +571,6 @@ export default function TVACaseFileModal({ onClose }) {
           font-size: 12px;
           font-weight: bold;
           color: #b45309;
-        }
-
-        .tva-wax-stamp {
-          border: 2px solid #b91c1c;
-          color: #b91c1c;
-          font-family: 'Cinzel', serif;
-          font-weight: 900;
-          font-size: 12px;
-          padding: 6px 14px;
-          border-radius: 4px;
-          letter-spacing: 1px;
-          transform: rotate(-3deg);
         }
 
         @media print {
